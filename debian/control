@@ -1,0 +1,12 @@
+Source: ros-ardent-rviz-ogre-vendor
+Section: misc
+Priority: extra
+Maintainer: Steven! Ragnarök <stevenragnarok@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), cmake, ros-ardent-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-ardent-rviz-ogre-vendor
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-ardent-ros-workspace
+Description: Vendor package to build ogre.
