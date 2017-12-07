@@ -9,6 +9,10 @@
 
   <buildtool_depend>cmake</buildtool_depend>
 
+  <build_depend>pkg-config</build_depend>
+  <build_depend>libfreetype6-dev</build_depend>
+  <build_depend>python3-dev</build_depend>
+
   <depend>libx11-dev</depend>
   <depend>libxaw</depend>
 
