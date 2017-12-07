@@ -9,6 +9,9 @@
 
   <buildtool_depend>cmake</buildtool_depend>
 
+  <depend>libx11-dev</depend>
+  <depend>libxaw</depend>
+
   <export>
     <build_type>cmake</build_type>
   </export>
