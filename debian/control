@@ -1,0 +1,12 @@
+Source: ros-ardent-rviz2
+Section: misc
+Priority: extra
+Maintainer: D. Hood <dhood@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), ros-ardent-ament-cmake, ros-ardent-ament-cmake-cppcheck, ros-ardent-ament-cmake-cpplint, ros-ardent-ament-cmake-lint-cmake, ros-ardent-ament-cmake-uncrustify, ros-ardent-geometry-msgs, ros-ardent-rclcpp, ros-ardent-rviz-common, ros-ardent-rviz-ogre-vendor, ros-ardent-sensor-msgs, ros-ardent-ros-workspace
+Homepage: http://ros.org/wiki/rviz2
+Standards-Version: 3.9.2
+
+Package: ros-ardent-rviz2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-ardent-rviz-common, ros-ardent-rviz-ogre-vendor, ros-ardent-ros-workspace
+Description: 3D visualization tool for ROS.
