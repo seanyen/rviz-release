@@ -1,0 +1,12 @@
+Source: ros-ardent-rviz-default-plugins
+Section: misc
+Priority: extra
+Maintainer: William Woodall <william@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-ardent-ament-cmake, ros-ardent-pluginlib, ros-ardent-rclcpp, ros-ardent-rviz-common, ros-ardent-rviz-rendering, ros-ardent-ros-workspace
+Homepage: http://ros.org/wiki/rviz_default_plugins
+Standards-Version: 3.9.2
+
+Package: ros-ardent-rviz-default-plugins
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5opengl5, libqt5widgets5, ros-ardent-pluginlib, ros-ardent-rclcpp, ros-ardent-rviz-common, ros-ardent-rviz-rendering, ros-ardent-ros-workspace
+Description: Several default plugins for rviz to cover the basic functionality.
