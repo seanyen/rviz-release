@@ -1,0 +1,12 @@
+Source: ros-ardent-rviz-common
+Section: misc
+Priority: extra
+Maintainer: William Woodall <william@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-ardent-ament-cmake, ros-ardent-ament-cmake-cppcheck, ros-ardent-ament-cmake-cpplint, ros-ardent-ament-cmake-gtest, ros-ardent-ament-cmake-lint-cmake, ros-ardent-ament-cmake-uncrustify, ros-ardent-geometry-msgs, ros-ardent-pluginlib, ros-ardent-rclcpp, ros-ardent-resource-retriever, ros-ardent-rviz-assimp-vendor, ros-ardent-rviz-rendering, ros-ardent-rviz-yaml-cpp-vendor, ros-ardent-sensor-msgs, ros-ardent-std-msgs, ros-ardent-tf2, ros-ardent-tf2-geometry-msgs, ros-ardent-tf2-ros, ros-ardent-tinyxml-vendor, ros-ardent-urdf, ros-ardent-ros-workspace
+Homepage: http://ros.org/wiki/rviz_common
+Standards-Version: 3.9.2
+
+Package: ros-ardent-rviz-common
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5opengl5, libqt5widgets5, qtbase5-dev, ros-ardent-geometry-msgs, ros-ardent-pluginlib, ros-ardent-rclcpp, ros-ardent-resource-retriever, ros-ardent-rviz-assimp-vendor, ros-ardent-rviz-rendering, ros-ardent-rviz-yaml-cpp-vendor, ros-ardent-sensor-msgs, ros-ardent-std-msgs, ros-ardent-tf2, ros-ardent-tf2-geometry-msgs, ros-ardent-tf2-ros, ros-ardent-tinyxml-vendor, ros-ardent-urdf, ros-ardent-ros-workspace
+Description: Common rviz API, used by rviz plugins and applications.
