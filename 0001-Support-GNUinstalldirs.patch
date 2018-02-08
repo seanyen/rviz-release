@@ -1,4 +1,4 @@
-From 1aff2271baa002351ff428dfe4b6fa003e6246ce Mon Sep 17 00:00:00 2001
+From f21c6ba3654b124f836fd98c903b049c88c20305 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
 Date: Fri, 8 Dec 2017 11:57:39 -0800
 Subject: [PATCH] Support GNUinstalldirs.
@@ -21,5 +21,5 @@ index 9c9604d..30120f6 100755
  override_dh_auto_install:
  	# In case we're installing to a non-standard location, look for a setup.sh
 -- 
-2.7.4
+2.14.3 (Apple Git-98)
 
