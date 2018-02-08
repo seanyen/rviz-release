@@ -1,6 +1,6 @@
 <package format="2">
   <name>rviz_rendering</name>
-  <version>2.0.0</version>
+  <version>3.0.0</version>
   <description>
     Library which provides the 3D rendering functionality in rviz.
   </description>
@@ -11,9 +11,9 @@
   <author>David Gossow</author>
   <author>Josh Faust</author>
 
-  <url type="website">http://ros.org/wiki/rviz_rendering</url>
-  <url type="repository">https://github.com/ros-visualization/rviz</url>
-  <url type="bugtracker">https://github.com/ros-visualization/rviz/issues</url>
+  <!--url type="website">http://ros.org/wiki/rviz_rendering</url-->
+  <url type="repository">https://github.com/ros2/rviz</url>
+  <url type="bugtracker">https://github.com/ros2/rviz/issues</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
