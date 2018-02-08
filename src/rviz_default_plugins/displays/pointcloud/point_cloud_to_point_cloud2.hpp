@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2017, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,36 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__POINTCLOUD__POINT_CLOUD_TO_POINT_CLOUD2_HPP_
+#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__POINTCLOUD__POINT_CLOUD_TO_POINT_CLOUD2_HPP_
 
-#include <QKeyEvent>
-
-#include "rviz_common/render_panel.hpp"
-#include "rviz_common/tool.hpp"
-#include "rviz_common/viewport_mouse_event.hpp"
+# include "sensor_msgs/msg/point_cloud.hpp"
+# include "sensor_msgs/msg/point_cloud2.hpp"
 
 namespace rviz_default_plugins
 {
-namespace tools
-{
 
-class DisplayContext;
+sensor_msgs::msg::PointCloud2::ConstSharedPtr
+convertPointCloudToPointCloud2(sensor_msgs::msg::PointCloud::ConstSharedPtr input);
 
-class MoveTool : public rviz_common::Tool
-{
-public:
-  MoveTool();
-  virtual ~MoveTool();
-
-  void activate() override;
-  void deactivate() override;
-
-  int processMouseEvent(rviz_common::ViewportMouseEvent & event) override;
-  int processKeyEvent(QKeyEvent * event, rviz_common::RenderPanel * panel) override;
-};
-
-}  // namespace tools
 }  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__POINTCLOUD__POINT_CLOUD_TO_POINT_CLOUD2_HPP_

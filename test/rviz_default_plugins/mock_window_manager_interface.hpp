@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2017, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,36 +27,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__MOCK_WINDOW_MANAGER_INTERFACE_HPP_
+#define RVIZ_DEFAULT_PLUGINS__MOCK_WINDOW_MANAGER_INTERFACE_HPP_
 
-#include <QKeyEvent>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
-#include "rviz_common/render_panel.hpp"
-#include "rviz_common/tool.hpp"
-#include "rviz_common/viewport_mouse_event.hpp"
+#include "rviz_common/panel_dock_widget.hpp"
 
-namespace rviz_default_plugins
-{
-namespace tools
-{
+#include "rviz_common/window_manager_interface.hpp"
 
-class DisplayContext;
-
-class MoveTool : public rviz_common::Tool
+class MockWindowManagerInterface : public rviz_common::WindowManagerInterface
 {
 public:
-  MoveTool();
-  virtual ~MoveTool();
+  MOCK_METHOD0(getParentWindow, QWidget * ());
 
-  void activate() override;
-  void deactivate() override;
+  MOCK_METHOD4(addPane,
+    rviz_common::PanelDockWidget *(
+      const QString &name, QWidget * pane, Qt::DockWidgetArea area, bool floating));
 
-  int processMouseEvent(rviz_common::ViewportMouseEvent & event) override;
-  int processKeyEvent(QKeyEvent * event, rviz_common::RenderPanel * panel) override;
+  MOCK_METHOD1(setStatus, void(const QString &message));
 };
 
-}  // namespace tools
-}  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__MOCK_WINDOW_MANAGER_INTERFACE_HPP_

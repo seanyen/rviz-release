@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2017, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,36 +27,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__IMAGE__ROS_IMAGE_TEXTURE_IFACE_HPP_
+#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__IMAGE__ROS_IMAGE_TEXTURE_IFACE_HPP_
 
-#include <QKeyEvent>
+#include <OgreTexture.h>
+#include <OgreSharedPtr.h>
 
-#include "rviz_common/render_panel.hpp"
-#include "rviz_common/tool.hpp"
-#include "rviz_common/viewport_mouse_event.hpp"
+#include "sensor_msgs/msg/image.hpp"
 
 namespace rviz_default_plugins
 {
-namespace tools
+namespace displays
 {
 
-class DisplayContext;
-
-class MoveTool : public rviz_common::Tool
+class ROSImageTextureIface
 {
 public:
-  MoveTool();
-  virtual ~MoveTool();
+  ROSImageTextureIface() = default;
+  virtual ~ROSImageTextureIface() = default;
 
-  void activate() override;
-  void deactivate() override;
+  virtual void addMessage(sensor_msgs::msg::Image::ConstSharedPtr image) = 0;
+  virtual bool update() = 0;
+  virtual void clear() = 0;
 
-  int processMouseEvent(rviz_common::ViewportMouseEvent & event) override;
-  int processKeyEvent(QKeyEvent * event, rviz_common::RenderPanel * panel) override;
+  virtual const Ogre::String getName() = 0;
+  virtual const Ogre::TexturePtr & getTexture() = 0;
+  virtual const sensor_msgs::msg::Image::ConstSharedPtr getImage() = 0;
+
+  virtual uint32_t getWidth() = 0;
+  virtual uint32_t getHeight() = 0;
+
+  // automatic range normalization
+  virtual void setNormalizeFloatImage(bool normalize) = 0;
+  virtual void setNormalizeFloatImage(bool normalize, double min, double max) = 0;
+  virtual void setMedianFrames(unsigned median_frames) = 0;
 };
 
-}  // namespace tools
+}  // namespace displays
 }  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__IMAGE__ROS_IMAGE_TEXTURE_IFACE_HPP_
