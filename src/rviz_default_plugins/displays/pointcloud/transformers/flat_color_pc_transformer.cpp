@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2010, Willow Garage, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,36 +27,61 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#include "rviz_common/properties/color_property.hpp"
+#include "../point_cloud_helpers.hpp"
 
-#include <QKeyEvent>
-
-#include "rviz_common/render_panel.hpp"
-#include "rviz_common/tool.hpp"
-#include "rviz_common/viewport_mouse_event.hpp"
+#include "./flat_color_pc_transformer.hpp"
 
 namespace rviz_default_plugins
 {
-namespace tools
+
+uint8_t FlatColorPCTransformer::supports(
+  const sensor_msgs::msg::PointCloud2::ConstSharedPtr & cloud)
 {
+  (void) cloud;
+  return PointCloudTransformer::Support_Color;
+}
 
-class DisplayContext;
-
-class MoveTool : public rviz_common::Tool
+uint8_t FlatColorPCTransformer::score(const sensor_msgs::msg::PointCloud2::ConstSharedPtr & cloud)
 {
-public:
-  MoveTool();
-  virtual ~MoveTool();
+  (void) cloud;
+  return 0;
+}
 
-  void activate() override;
-  void deactivate() override;
+bool FlatColorPCTransformer::transform(
+  const sensor_msgs::msg::PointCloud2::ConstSharedPtr & cloud,
+  uint32_t mask,
+  const Ogre::Matrix4 & transform,
+  V_PointCloudPoint & points_out)
+{
+  (void) transform;
+  if (!(mask & PointCloudTransformer::Support_Color)) {
+    return false;
+  }
 
-  int processMouseEvent(rviz_common::ViewportMouseEvent & event) override;
-  int processKeyEvent(QKeyEvent * event, rviz_common::RenderPanel * panel) override;
-};
+  Ogre::ColourValue color = color_property_->getOgreColor();
 
-}  // namespace tools
-}  // namespace rviz_default_plugins
+  const uint32_t num_points = cloud->width * cloud->height;
+  for (uint32_t i = 0; i < num_points; ++i) {
+    points_out[i].color = color;
+  }
 
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+  return true;
+}
+
+void FlatColorPCTransformer::createProperties(
+  rviz_common::properties::Property * parent_property,
+  uint32_t mask,
+  QList<rviz_common::properties::Property *> & out_props)
+{
+  if (mask & PointCloudTransformer::Support_Color) {
+    color_property_ = new rviz_common::properties::ColorProperty(
+      "Color", Qt::white,
+      "Color to assign to every point.",
+      parent_property, SIGNAL(needRetransform()),
+      this);
+    out_props.push_back(color_property_);
+  }
+}
+
+}  // end namespace rviz_default_plugins

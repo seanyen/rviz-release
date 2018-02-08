@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,36 +27,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#include "point_cloud_display.hpp"
 
-#include <QKeyEvent>
+#include <memory>
+#include <utility>
 
-#include "rviz_common/render_panel.hpp"
-#include "rviz_common/tool.hpp"
-#include "rviz_common/viewport_mouse_event.hpp"
+#include <OgreSceneNode.h>
+
+#include "./point_cloud_common.hpp"
+#include "rviz_common/display_context.hpp"
+#include "rviz_common/frame_manager.hpp"
+#include "rviz_common/properties/int_property.hpp"
+#include "rviz_common/properties/queue_size_property.hpp"
 
 namespace rviz_default_plugins
 {
-namespace tools
+namespace displays
 {
 
-class DisplayContext;
+PointCloudDisplay::PointCloudDisplay()
+: queue_size_property_(new rviz_common::QueueSizeProperty(this, 10)),
+  point_cloud_common_(std::make_unique<PointCloudCommon>(this))
+{}
 
-class MoveTool : public rviz_common::Tool
+void PointCloudDisplay::onInitialize()
 {
-public:
-  MoveTool();
-  virtual ~MoveTool();
+  RTDClass::onInitialize();
+  topic_property_->setValue("pointcloud");
+  point_cloud_common_->initialize(context_, scene_node_);
+}
 
-  void activate() override;
-  void deactivate() override;
+void PointCloudDisplay::processMessage(const sensor_msgs::msg::PointCloud::ConstSharedPtr cloud)
+{
+  point_cloud_common_->addMessage(cloud);
+}
 
-  int processMouseEvent(rviz_common::ViewportMouseEvent & event) override;
-  int processKeyEvent(QKeyEvent * event, rviz_common::RenderPanel * panel) override;
-};
+void PointCloudDisplay::update(float wall_dt, float ros_dt)
+{
+  point_cloud_common_->update(wall_dt, ros_dt);
+}
 
-}  // namespace tools
+void PointCloudDisplay::reset()
+{
+  RTDClass::reset();
+  point_cloud_common_->reset();
+}
+
+}  // namespace displays
 }  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#include <pluginlib/class_list_macros.hpp>  // NOLINT
+PLUGINLIB_EXPORT_CLASS(rviz_default_plugins::displays::PointCloudDisplay, rviz_common::Display)

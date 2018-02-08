@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2017, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,36 +27,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__IMAGE__MOCK_ROS_IMAGE_TEXTURE_HPP_
+#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__IMAGE__MOCK_ROS_IMAGE_TEXTURE_HPP_
 
-#include <QKeyEvent>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
-#include "rviz_common/render_panel.hpp"
-#include "rviz_common/tool.hpp"
-#include "rviz_common/viewport_mouse_event.hpp"
+#include "../../../../src/rviz_default_plugins/displays/image/ros_image_texture_iface.hpp"
 
-namespace rviz_default_plugins
-{
-namespace tools
-{
-
-class DisplayContext;
-
-class MoveTool : public rviz_common::Tool
+class MockROSImageTexture : public rviz_default_plugins::displays::ROSImageTextureIface
 {
 public:
-  MoveTool();
-  virtual ~MoveTool();
+  MOCK_METHOD1(addMessage, void(sensor_msgs::msg::Image::ConstSharedPtr image));
+  MOCK_METHOD0(update, bool());
+  MOCK_METHOD0(clear, void());
 
-  void activate() override;
-  void deactivate() override;
+  MOCK_METHOD0(getName, const Ogre::String());
+  MOCK_METHOD0(getTexture, const Ogre::TexturePtr & ());
+  MOCK_METHOD0(getImage, const sensor_msgs::msg::Image::ConstSharedPtr());
+  MOCK_METHOD0(getMaterial, Ogre::MaterialPtr());
 
-  int processMouseEvent(rviz_common::ViewportMouseEvent & event) override;
-  int processKeyEvent(QKeyEvent * event, rviz_common::RenderPanel * panel) override;
+  MOCK_METHOD0(getWidth, uint32_t());
+  MOCK_METHOD0(getHeight, uint32_t());
+
+  MOCK_METHOD1(setNormalizeFloatImage, void(bool normalize));
+  MOCK_METHOD3(setNormalizeFloatImage, void(bool normalize, double min, double max));
+  MOCK_METHOD1(setMedianFrames, void(unsigned median_frames));
 };
 
-}  // namespace tools
-}  // namespace rviz_default_plugins
-
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__MOVE__MOVE_TOOL_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__IMAGE__MOCK_ROS_IMAGE_TEXTURE_HPP_

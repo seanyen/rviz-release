@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,25 +27,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID__GRID_DISPLAY_HPP_
-#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID__GRID_DISPLAY_HPP_
 
-#include <memory>
+#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__POLYGON__POLYGON_DISPLAY_HPP_
+#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__POLYGON__POLYGON_DISPLAY_HPP_
 
-#include "rviz_common/display.hpp"
-#include "rviz_common/properties/color_property.hpp"
-#include "rviz_common/properties/enum_property.hpp"
-#include "rviz_common/properties/float_property.hpp"
-#include "rviz_common/properties/int_property.hpp"
-#include "rviz_common/properties/tf_frame_property.hpp"
-#include "rviz_common/properties/vector_property.hpp"
+#include <geometry_msgs/msg/polygon_stamped.hpp>
 
-namespace rviz_rendering
+#include "rviz_common/ros_topic_display.hpp"
+
+namespace Ogre
 {
+class ManualObject;
+}
 
-class Grid;
-
-}  // namespace rviz_rendering
+namespace rviz_common
+{
+namespace properties
+{
+class ColorProperty;
+class FloatProperty;
+}  // namespace properties
+}  // namespace rviz_common
 
 namespace rviz_default_plugins
 {
@@ -54,56 +55,35 @@ namespace displays
 {
 
 /**
- * \class GridDisplay
- * \brief Displays a grid in either the XY, YZ, or XZ plane.
- *
- * For more information see Grid
+ * \class PolygonDisplay
+ * \brief Displays a geometry_msgs::PolygonStamped message
  */
-class GridDisplay : public rviz_common::Display
+class PolygonDisplay : public rviz_common::RosTopicDisplay<geometry_msgs::msg::PolygonStamped>
 {
   Q_OBJECT
 
 public:
-  enum Plane
-  {
-    XY,
-    XZ,
-    YZ,
-  };
+  PolygonDisplay();
+  ~PolygonDisplay() override;
 
-  GridDisplay();
-  ~GridDisplay() override;
-
-  // Overrides from Display
   void onInitialize() override;
-  void update(float dt, float ros_dt) override;
 
-private Q_SLOTS:
-  void updateCellCount();
-  void updateCellSize();
-  void updateColor();
-  void updateHeight();
-  void updateLineWidth();
-  void updateOffset();
-  void updatePlane();
-  void updateStyle();
+  void reset() override;
 
-private:
-  std::unique_ptr<rviz_rendering::Grid> grid_;  ///< Handles actually drawing the grid
+protected:
+  void processMessage(geometry_msgs::msg::PolygonStamped::ConstSharedPtr msg) override;
 
-  rviz_common::properties::TfFrameProperty * frame_property_;
-  rviz_common::properties::IntProperty * cell_count_property_;
-  rviz_common::properties::IntProperty * height_property_;
-  rviz_common::properties::FloatProperty * cell_size_property_;
-  rviz_common::properties::FloatProperty * line_width_property_;
-  rviz_common::properties::EnumProperty * style_property_;
+  Ogre::ManualObject * manual_object_;
+  Ogre::MaterialPtr material_;
+
   rviz_common::properties::ColorProperty * color_property_;
   rviz_common::properties::FloatProperty * alpha_property_;
-  rviz_common::properties::EnumProperty * plane_property_;
-  rviz_common::properties::VectorProperty * offset_property_;
+
+private:
+  void enableBlending(const Ogre::ColourValue & color);
 };
 
 }  // namespace displays
 }  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID__GRID_DISPLAY_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__POLYGON__POLYGON_DISPLAY_HPP_
