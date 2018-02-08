@@ -27,49 +27,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OGRE_TESTING_ENVIRONMENT_HPP_
-#define OGRE_TESTING_ENVIRONMENT_HPP_
+#include "test/rviz_rendering/ogre_testing_environment.hpp"
 
-#include <string>
-
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wpedantic"
-# ifdef __clang__
-#  pragma clang diagnostic ignored "-Wextra-semi"
-# endif
-#endif
-
-#include <OgreLogManager.h>
-
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
-#include "../src/rviz_rendering/render_system.hpp"
+#include "src/rviz_rendering/render_system.hpp"
 
 namespace rviz_rendering
 {
-class OgreTestingEnvironment
+
+
+void OgreTestingEnvironment::setUpRenderSystem()
 {
-public:
-  /**
-   * Set up a testing environment to run tests needing Ogre.
-   *
-   * @param: bool debug, if true, all logging of Ogre is send to std::out, if false no logging
-   * occurs. Since the logging pollutes the test output, it defaults to false
-   */
-  void setUpOgreTestEnvironment(bool debug = false)
-  {
-    if (!debug) {
-      const std::string & name = "";
-      auto lm = new Ogre::LogManager();
-      lm->createLog(name, false, debug, true);
-    }
-    RenderSystem::get();
-  }
-};
+  RenderSystem::get();
+}
 
-}  // namespace rviz_rendering
-
-#endif  // OGRE_TESTING_ENVIRONMENT_HPP_
+}  // end namespace rviz_rendering
