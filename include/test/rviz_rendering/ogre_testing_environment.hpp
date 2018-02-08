@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2017, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,38 +27,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_RENDERING__VISIBILITY_CONTROL_HPP_
-#define RVIZ_RENDERING__VISIBILITY_CONTROL_HPP_
+#ifndef RVIZ_RENDERING__OGRE_TESTING_ENVIRONMENT_HPP_
+#define RVIZ_RENDERING__OGRE_TESTING_ENVIRONMENT_HPP_
 
-// This logic was borrowed (then namespaced) from the examples on the gcc wiki:
-//     https://gcc.gnu.org/wiki/Visibility
+#include <string>
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef __GNUC__
-    #define RVIZ_RENDERING_EXPORT __attribute__ ((dllexport))
-    #define RVIZ_RENDERING_IMPORT __attribute__ ((dllimport))
-  #else
-    #define RVIZ_RENDERING_EXPORT __declspec(dllexport)
-    #define RVIZ_RENDERING_IMPORT __declspec(dllimport)
-  #endif
-  #ifdef RVIZ_RENDERING_BUILDING_LIBRARY
-    #define RVIZ_RENDERING_PUBLIC RVIZ_RENDERING_EXPORT
-  #else
-    #define RVIZ_RENDERING_PUBLIC RVIZ_RENDERING_IMPORT
-  #endif
-  #define RVIZ_RENDERING_PUBLIC_TYPE RVIZ_RENDERING_PUBLIC
-  #define RVIZ_RENDERING_LOCAL
-#else
-  #define RVIZ_RENDERING_EXPORT __attribute__ ((visibility("default")))
-  #define RVIZ_RENDERING_IMPORT
-  #if __GNUC__ >= 4
-    #define RVIZ_RENDERING_PUBLIC __attribute__ ((visibility("default")))
-    #define RVIZ_RENDERING_LOCAL  __attribute__ ((visibility("hidden")))
-  #else
-    #define RVIZ_RENDERING_PUBLIC
-    #define RVIZ_RENDERING_LOCAL
-  #endif
-  #define RVIZ_RENDERING_PUBLIC_TYPE
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wpedantic"
+# ifdef __clang__
+#  pragma clang diagnostic ignored "-Wextra-semi"
+# endif
 #endif
 
-#endif  // RVIZ_RENDERING__VISIBILITY_CONTROL_HPP_
+#include <OgreLogManager.h>
+
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+
+#include "rviz_rendering/visibility_control.hpp"
+
+namespace rviz_rendering
+{
+class RVIZ_RENDERING_PUBLIC OgreTestingEnvironment
+{
+public:
+  /**
+   * Set up a testing environment to run tests needing Ogre.
+   *
+   * @param: bool debug, if true, all logging of Ogre is send to std::out, if false no logging
+   * occurs. Since the logging pollutes the test output, it defaults to false
+   */
+  void setUpOgreTestEnvironment(bool debug = false)
+  {
+    if (!debug) {
+      const std::string & name = "";
+      auto lm = new Ogre::LogManager();
+      lm->createLog(name, false, debug, true);
+    }
+    setUpRenderSystem();
+  }
+
+  void setUpRenderSystem();
+};
+
+}  // namespace rviz_rendering
+
+#endif  // RVIZ_RENDERING__OGRE_TESTING_ENVIRONMENT_HPP_
