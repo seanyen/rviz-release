@@ -1,3 +1,38 @@
+## rviz (bouncy) - 4.0.0-2
+
+The packages in the `rviz` repository were released into the `bouncy` distro by running `/usr/bin/bloom-release rviz -r bouncy --override-release-repository-push-url git@github.com:ros2-gbp/rviz-release` on `Thu, 28 Jun 2018 11:39:08 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+- `rviz_yaml_cpp_vendor`
+
+These packages were explicitly ignored:
+- `rviz`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: https://github.com/ros2-gbp/rviz-release.git
+- rosdistro version: `4.0.0-1`
+- old version: `4.0.0-1`
+- new version: `4.0.0-2`
+
+Versions of tools used:
+
+- bloom version: `0.6.5`
+- catkin_pkg version: `0.4.1`
+- rosdep version: `0.12.2`
+- rosdistro version: `0.6.8`
+- vcstools version: `0.1.40`
+
+
 ## rviz (bouncy) - 4.0.0-1
 
 The packages in the `rviz` repository were released into the `bouncy` distro by running `/usr/local/opt/python2/Frameworks/Python.framework/Versions/2.7/bin/bloom-release -r bouncy -t bouncy rviz` on `Thu, 28 Jun 2018 06:40:35 -0000`
