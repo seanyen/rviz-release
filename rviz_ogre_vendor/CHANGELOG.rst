@@ -2,6 +2,9 @@
 Changelog for package rviz_ogre_vendor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.0.1 (2018-06-28)
+------------------
+
 4.0.0 (2018-06-27)
 ------------------
 * Changed the download timeout for Ogre to be twenty (20) minutes. (`#323 <https://github.com/ros2/rviz/issues/323>`_)
