@@ -1,4 +1,4 @@
-From 85cc7243cc84e0fa22fe716581618df20337438b Mon Sep 17 00:00:00 2001
+From 157e3879861fcdf1fd6dc951498b3869749b14bd Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
 Date: Thu, 8 Feb 2018 12:16:49 -0800
 Subject: [PATCH] Tell shlibdeps where to find vendor libraries.
