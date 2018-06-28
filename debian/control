@@ -1,0 +1,12 @@
+Source: ros-bouncy-rviz-rendering-tests
+Section: misc
+Priority: extra
+Maintainer: William Woodall <william@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), ros-bouncy-ament-cmake, ros-bouncy-ament-cmake-cppcheck, ros-bouncy-ament-cmake-cpplint, ros-bouncy-ament-cmake-gmock, ros-bouncy-ament-cmake-gtest, ros-bouncy-ament-cmake-lint-cmake, ros-bouncy-ament-cmake-uncrustify, ros-bouncy-ament-index-cpp, ros-bouncy-resource-retriever, ros-bouncy-rviz-rendering, ros-bouncy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-bouncy-rviz-rendering-tests
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-bouncy-resource-retriever, ros-bouncy-rviz-rendering, ros-bouncy-ros-workspace
+Description: Example plugin for RViz - documents and tests RViz plugin development
