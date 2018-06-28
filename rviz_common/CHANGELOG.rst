@@ -2,6 +2,9 @@
 Changelog for package rviz_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.0.1 (2018-06-28)
+------------------
+
 4.0.0 (2018-06-27)
 ------------------
 * Polished selection behavior. (`#315 <https://github.com/ros2/rviz/issues/315>`_)
