@@ -143,10 +143,10 @@ void getPluginGroups(
   const QMap<QString, QString> & datatype_plugins,
   QList<PluginGroup> * groups,
   std::vector<std::string> * unvisualizable,
-  rviz_common::ros_integration::RosNodeAbstractionIface & ros_node_abstraction)
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node)
 {
   std::map<std::string, std::vector<std::string>> topic_names_and_types =
-    ros_node_abstraction.get_topic_names_and_types();
+    rviz_ros_node.lock()->get_topic_names_and_types();
 
   for (const auto map_pair : topic_names_and_types) {
     QString topic = QString::fromStdString(map_pair.first);
@@ -202,7 +202,7 @@ AddDisplayDialog::AddDisplayDialog(
   const QStringList & disallowed_display_names,
   const QStringList & disallowed_class_lookup_names,
   QString * lookup_name_output,
-  const std::string & node_name,
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
   QString * display_name_output,
   QString * topic_output,
   QString * datatype_output,
@@ -217,9 +217,11 @@ AddDisplayDialog::AddDisplayDialog(
   datatype_output_(datatype_output)
 {
   //***** Layout
+  setObjectName("AddDisplayDialog");
 
   // Display Type group
   QGroupBox * type_box = new QGroupBox("Create visualization");
+  type_box->setObjectName("AddDisplayDialog/Visualization_Typebox");
 
   QLabel * description_label = new QLabel("Description:");
   description_ = new QTextBrowser;
@@ -229,11 +231,11 @@ AddDisplayDialog::AddDisplayDialog(
   DisplayTypeTree * display_tree = new DisplayTypeTree;
   display_tree->fillTree(factory);
 
-  TopicDisplayWidget * topic_widget = new TopicDisplayWidget(
-    std::make_unique<rviz_common::ros_integration::RosNodeAbstraction>(node_name));
+  TopicDisplayWidget * topic_widget = new TopicDisplayWidget(rviz_ros_node);
   topic_widget->fill(factory);
 
   tab_widget_ = new QTabWidget;
+  tab_widget_->setObjectName("Visualization_Typebox/TabWidget");
   display_tab_ = tab_widget_->addTab(display_tree, tr("By display type"));
   topic_tab_ = tab_widget_->addTab(topic_widget, tr("By topic"));
 
@@ -257,6 +259,7 @@ AddDisplayDialog::AddDisplayDialog(
   // Buttons
   button_box_ =
     new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal);
+  button_box_->setObjectName("AddDisplayDialog/ButtonBox");
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(type_box);
@@ -412,7 +415,7 @@ void DisplayTypeTree::onCurrentItemChanged(
 
 void DisplayTypeTree::fillTree(Factory * factory)
 {
-  QIcon default_package_icon = loadPixmap("package://rviz/icons/default_package_icon.png");
+  QIcon default_package_icon = loadPixmap("package://rviz_common/icons/default_package_icon.png");
 
   QStringList classes = factory->getDeclaredClassIds();
   classes.sort();
@@ -452,8 +455,8 @@ void DisplayTypeTree::fillTree(Factory * factory)
 }
 
 TopicDisplayWidget::TopicDisplayWidget(
-  std::unique_ptr<rviz_common::ros_integration::RosNodeAbstractionIface> ros_node_abstraction)
-: ros_node_abstraction_(std::move(ros_node_abstraction))
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node)
+: rviz_ros_node_(rviz_ros_node)
 {
   tree_ = new QTreeWidget;
   tree_->setHeaderHidden(true);
@@ -537,7 +540,7 @@ void TopicDisplayWidget::fill(DisplayFactory * factory)
 
   QList<PluginGroup> groups;
   std::vector<std::string> unvisualizable;
-  getPluginGroups(datatype_plugins_, &groups, &unvisualizable, *ros_node_abstraction_);
+  getPluginGroups(datatype_plugins_, &groups, &unvisualizable, rviz_ros_node_);
 
   // Insert visualizable topics along with their plugins
   QList<PluginGroup>::const_iterator pg_it;

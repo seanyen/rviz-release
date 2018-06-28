@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "tf_display.hpp"
+#include "rviz_default_plugins/displays/tf/tf_display.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -38,38 +38,30 @@
 #include <vector>
 #include <utility>
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
 #include "tf2_ros/transform_listener.h"
 
+#include "rviz_rendering/objects/arrow.hpp"
+#include "rviz_rendering/objects/axes.hpp"
+#include "rviz_rendering/objects/movable_text.hpp"
 #include "rviz_common/display_context.hpp"
-#include "rviz_common/frame_manager.hpp"
-#include "rviz_rendering/arrow.hpp"
-#include "rviz_rendering/axes.hpp"
-#include "rviz_rendering/movable_text.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
 #include "rviz_common/logging.hpp"
+#include "rviz_common/msg_conversions.hpp"
 #include "rviz_common/properties/bool_property.hpp"
 #include "rviz_common/properties/float_property.hpp"
 #include "rviz_common/properties/quaternion_property.hpp"
 #include "rviz_common/properties/string_property.hpp"
 #include "rviz_common/properties/vector_property.hpp"
-#include "rviz_common/selection/forwards.hpp"
-#include "rviz_common/selection/selection_manager.hpp"
+#include "rviz_common/interaction/forwards.hpp"
+#include "rviz_common/interaction/selection_manager.hpp"
 #include "rviz_common/uniform_string_stream.hpp"
-#include "frame_info.hpp"
-#include "frame_selection_handler.hpp"
+#include "include/rviz_default_plugins/displays/tf/frame_info.hpp"
+#include "include/rviz_default_plugins/displays/tf/frame_selection_handler.hpp"
 
-using rviz_common::selection::SelectionHandler;
+using rviz_common::interaction::SelectionHandler;
 using rviz_common::properties::BoolProperty;
 using rviz_common::properties::FloatProperty;
 using rviz_common::properties::StatusProperty;
@@ -77,7 +69,7 @@ using rviz_common::properties::StringProperty;
 using rviz_common::properties::Property;
 using rviz_common::properties::QuaternionProperty;
 using rviz_common::properties::VectorProperty;
-using rviz_common::selection::Picked;
+using rviz_common::interaction::Picked;
 using rviz_rendering::Axes;
 using rviz_rendering::Arrow;
 using rviz_rendering::MovableText;
@@ -273,7 +265,7 @@ void TFDisplay::update(float wall_dt, float ros_dt)
   (void) ros_dt;
   update_timer_ += wall_dt;
   float update_rate = update_rate_property_->getFloat();
-  if (update_rate < 0.0001f || update_timer_ > update_rate) {
+  if (update_rate < 0.0001f || update_timer_ > update_rate * 1000000000) {
     updateFrames();
 
     update_timer_ = 0.0f;
@@ -346,7 +338,8 @@ FrameInfo * TFDisplay::createFrame(const std::string & frame)
   info->last_update_ = tf2::get_now();
   info->axes_ = new Axes(scene_manager_, axes_node_, 0.2f, 0.02f);
   info->axes_->getSceneNode()->setVisible(show_axes_property_->getBool());
-  info->selection_handler_.reset(new FrameSelectionHandler(info, this, context_));
+  info->selection_handler_ =
+    rviz_common::interaction::createSelectionHandler<FrameSelectionHandler>(info, this, context_);
   info->selection_handler_->addTrackedObjects(info->axes_->getSceneNode());
 
   info->name_text_ = new MovableText(frame, "Liberation Sans", 0.1f);
@@ -535,18 +528,10 @@ void TFDisplay::updateRelativePositionAndOrientation(
     logTransformationException(frame->parent_, frame->name_, e.what());
   }
 
-  Ogre::Vector3 relative_position(
-    transform.transform.translation.x,
-    transform.transform.translation.y,
-    transform.transform.translation.z
-  );
-  Ogre::Quaternion relative_orientation(
-    transform.transform.rotation.w,
-    transform.transform.rotation.x,
-    transform.transform.rotation.y,
-    transform.transform.rotation.z);
-  frame->rel_position_property_->setVector(relative_position);
-  frame->rel_orientation_property_->setQuaternion(relative_orientation);
+  frame->rel_position_property_->setVector(
+    rviz_common::vector3MsgToOgre(transform.transform.translation));
+  frame->rel_orientation_property_->setQuaternion(
+    rviz_common::quaternionMsgToOgre(transform.transform.rotation));
 }
 
 void TFDisplay::updateParentArrowIfTransformExists(
@@ -560,8 +545,8 @@ void TFDisplay::updateParentArrowIfTransformExists(
   {
     logTransformationException(frame->parent_, frame->name_);
   } else {
-    frame->updateParentArrow(position, parent_position, scale_property_->getFloat());
     frame->setParentArrowVisible(show_arrows_property_->getBool());
+    frame->updateParentArrow(position, parent_position, scale_property_->getFloat());
   }
 }
 
@@ -574,7 +559,7 @@ void TFDisplay::deleteFrame(FrameInfo * frame, bool delete_properties)
   frames_.erase(it);
 
   delete frame->axes_;
-  context_->getSelectionManager()->removeObject(frame->axes_coll_);
+  context_->getHandlerManager()->removeHandler(frame->axes_coll_);
   delete frame->parent_arrow_;
   delete frame->name_text_;
   scene_manager_->destroySceneNode(frame->name_node_->getName());

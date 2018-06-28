@@ -1,77 +1,81 @@
-# rviz
+# RViz
 
-This branch is still under construction and is targeted for ROS 2 and/or ROS 1 M-Turtle.
+This branch is currently contained in the main `ros2.repos` file of ROS 2 and can be used for ROS 2.
+The latest release will be available with your ROS 2 download.
 
-# Setup
+ROS 2 does not have a wiki yet. To learn about RViz and its functionality, please refer to the ROS RViz [wiki page](http://www.ros.org/wiki/rviz). 
 
-Install ros2 (needed for ament at least and ros2's C++ api for the version of rviz in ros 2):
+## Features
+
+### Already ported
+These features have already been ported from `ros-visualization/rviz` to `ros2/rviz`.
+The basic documentation can still be found on the RViz [wiki page](http://www.ros.org/wiki/rviz). 
+For some displays, the [documentation is updated](docs/FEATURES.md).
+
+| Displays              | Tools         | View Controller       | Panels          |
+| --------------------- | ------------- | --------------------- | --------------- |
+| Camera                | Move Camera   | Orbit                 | Displays        |
+| Grid                  | Focus Camera  | XY Orbit              | Help            |
+| Grid Cells            | Measure       | First Person          | Selections      |
+| Image                 | Select        | Third Person Follower | Tool Properties |
+| Laser Scan            | 2D Nav Goal   | Top Down Orthographic | Views           |
+| Map                   | Publish Point |                       |                 |
+| Marker                |
+| Marker Array          |
+| Odometry              |
+| Point Cloud (1 and 2) |
+| Point                 |
+| Polygon               |
+| Pose                  |
+| Pose Array            |
+| Robot Model           |
+| TF                    |
+
+### Not yet ported
+These features have not been ported to `ros2/rviz` yet.
+
+| Displays             | Tools        | Panels |
+| -------------------- | ------------ | ------ |
+| Axes                 | Initial Pose | Time   |
+| DepthCloud           | Interact     |        |
+| Effort               |
+| Fluid Pressure       |
+| Illuminance          |
+| Interactive Marker   |
+| Oculus               |
+| Pose With Covariance |
+| Range                |
+| Relative Humidity    |
+| Temperature          |
+| Wrench               |
+
+Other features:
+- Filtering of Topic lists by topic type
+- Message filters
+- Image transport features
+
+In case you wished to see those features in RViz for ROS 2, feel free to add a pull request.
+Make sure to read the developer guide below and the migration guide.
+
+### New features
+
+None, yet.
+
+## Developer Guide
+
+### Build
+#### Building RViz together with ROS 2
+
+The simplest way to build from source is to use the official installation guide, since RViz is part of the official ROS 2 repos file.
 
 https://github.com/ros2/ros2/wiki/Installation
 
-Currently the latest release (beta3) is not sufficient to build rviz so you need to build the ros2 master from source.
+#### Building RViz in a separate workspace
 
-## Prerequisites
+When developing for RViz, it can be beneficial to build it in a separate workspace. 
 
-### Ubuntu
-
-There will be a `setup.bash` file from your ros2 build you can source.
-The current state of this branch requires a from-source build though.
-
-Install the following Ubuntu packages:
-
-```
-apt install libxaw7-dev libgles2-mesa-dev libglu1-mesa-dev qt5-default libyaml-cpp-dev libcurl4-openssl-dev
-```
-
-Source the setup file before continuing:
-
-```
-$ source path/to/ros2/install/setup.bash
-```
-
-### Windows
-
-**Note** Make sure to install all dependencies in either 32 bit or 64 bit version and do not mix.
-
-This setup was tested for Windows 10 x64.
-
-#### Build CURL 7.56.0
-* Download CURL sources from [GitHub](https://github.com/curl/curl/releases/tag/curl-7_56_0)
-* Extract to local folder (e.g. to `C:\ros2\curl-7.56.0`)
-* Create and change to build folder (e.g. `C:\ros2\curl-7.56.0\build`)
-    * Configure CMake: `cmake -G "Visual Studio 15 2017 Win64" ../`
-    * Build the project: `cmake --build . --config Debug`
-    * Install to `C:\Program Files`: `cmake --build . --config Debug --target Install`
-
-#### Get Boost (No build required)
-* Download Boost sources from https://dl.bintray.com/boostorg/release/1.65.1/source/
-* Extract to local folder (e.g. to `C:\ros2\boost_1_65_1`)
-
-#### Build yaml-cpp
-* Download yaml-cpp sources from [GitHub](https://github.com/jbeder/yaml-cpp/releases/tag/yaml-cpp-0.5.3)
-* Extract to local folder (e.g. to `C:\ros2\yaml-cpp-release-0.5.3`)
-* Create and change to build folder (e.g. `C:\ros2\yaml-cpp-release-0.5.3\build`)
-    * Configure CMake: `cmake -G "cmake -G "Visual Studio 15 2017 Win64" ../ -DBoost_INCLUDE_DIR=C:\ros2\boost_1_65_1`
-    * Build the project: `cmake --build . --config Debug`
-    * Install to `C:\Program Files`: `cmake --build . --config Debug --target Install`
-
-#### Setup environment
-* add Qt binary files to PATH (e.g. `C:\Qt\5.9.1\msvc2017_64\bin`)
-* set QT_QPA_PLATFORM_PLUGIN_PATH environment variable (e.g. `C:\Qt\5.9.1\msvc2017_64\plugins\platforms`)
-* Add Curl and yaml-cppto the CMAKE_PREFIX_PATH environment variable
-    * Example: `C:\Program Files\CURL;C:\Program Files\YAML_CPP`
-* Add Curl binary to PATH (e.g. `C:\Program Files\CURL\bin`)
-* Set BOOST_INCLUDEDIR environment variable to Boost include directory (e.g. `C:\ros2\boost_1_65_1`)
-* Add patch.exe to PATH (e.g. from Git Bash, `C:\Program Files\Git\usr\bin`)
-* (For Testing) Add Cppcheck binary to PATH (e.g. `C:\Program Files\Cppcheck`)
-
-Source the setup file before continuing:
-
-```
-$ call path/to/ros2/install/setup.bat
-```
-
-## Building RViz
+**Note:** When building the current ros2 branch from source, the latest ROS 2 release for all dependencies might not be sufficient: it could be necessary to build the ROS 2 master branch.
+Make sure to have a source build of ROS 2 available (see installation procedure above).
 
 Create a new workspace:
 
@@ -84,30 +88,20 @@ Clone these repositories into the source folder:
 
 ```
 $ git clone https://github.com/ros2/rviz.git
-$ git clone https://github.com/ros/pluginlib.git -b ros2
-$ git clone https://github.com/ros2/tinyxml2_vendor.git
 ```
 
 Then build all the packages with this command:
 
 ```
-$ ament build
+$ colcon build --merge-install
 ```
-
-Or specific packages with command, for example just `rviz_ogre_vendor` and then `rviz_rendering`:
-
-```
-$ ament build --only rviz_ogre_vendor
-$ ament build --only rviz_rendering
-```
+The `--merge-install` flag is optional but ensures a cleaner environment which is helpful for development.
 
 More instructions and examples to come.
 
-# Developer Guide
-
 In addition to the [ROS 2 Developer Guide](https://github.com/ros2/ros2/wiki/Developer-Guide) we suggest the following.
 
-## Testing
+### Testing
 
 Main rationale here is to create code that can be well tested by avoiding highly coupled components.
 
@@ -117,3 +111,17 @@ Main rationale here is to create code that can be well tested by avoiding highly
 * Use only the interface in the dependent code.
 * Specify dependencies as a constructor argument.
 * Prefer `std::unique_ptr` for storing the dependency instead of a raw pointer.
+
+### Migration
+
+When migrating from `ros-visualization/rviz` to `ros2/rviz`, please see the more extensive [migration guide](docs/migration_guide.md).
+
+### Plugin Development
+
+Plugins can extend RViz at different extension points:
+- Displays
+- Panels
+- Tools
+- View Controllers
+
+More information on writing plugins can be found in the [plugin development guide](docs/plugin_development.md).

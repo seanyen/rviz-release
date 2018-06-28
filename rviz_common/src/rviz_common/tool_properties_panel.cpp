@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2012, Willow Garage, Inc.
+ * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,30 +28,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tool_properties_panel.hpp"
+
 #include <QVBoxLayout>
 
-#include "rviz/properties/property_tree_widget.h"
-#include "rviz/tool_manager.h"
-#include "rviz/visualization_manager.h"
+#include "rviz_common/properties/property_tree_widget.hpp"
+#include "tool_manager.hpp"
+#include "visualization_manager.hpp"
 
-#include "rviz/tool_properties_panel.h"
-
-namespace rviz
+namespace rviz_common
 {
 
 ToolPropertiesPanel::ToolPropertiesPanel(QWidget * parent)
 : Panel(parent)
 {
-  QVBoxLayout * layout = new QVBoxLayout();
+  auto layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
-  tree_widget_ = new PropertyTreeWidget();
+  tree_widget_ = new rviz_common::properties::PropertyTreeWidget();
   layout->addWidget(tree_widget_);
   setLayout(layout);
 }
 
 void ToolPropertiesPanel::onInitialize()
 {
-  tree_widget_->setModel(vis_manager_->getToolManager()->getPropertyModel() );
+  tree_widget_->setModel(getDisplayContext()->getToolManager()->getPropertyModel() );
 }
 
 void ToolPropertiesPanel::save(Config config) const
@@ -65,4 +66,4 @@ void ToolPropertiesPanel::load(const Config & config)
   tree_widget_->load(config);
 }
 
-}  // namespace rviz
+}  // namespace rviz_common

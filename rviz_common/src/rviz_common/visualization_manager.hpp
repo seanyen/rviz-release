@@ -39,9 +39,11 @@
 #include "rclcpp/time.hpp"
 #include "tf2_ros/transform_listener.h"
 
-#include "include/rviz_common/bit_allocator.hpp"
+#include "rviz_common/bit_allocator.hpp"
 #include "rviz_common/config.hpp"
 #include "rviz_common/display_context.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
+#include "rviz_common/ros_integration/ros_node_abstraction_iface.hpp"
 
 class QTimer;
 
@@ -79,7 +81,7 @@ class VisualizationManagerPrivate;
  * It keeps the current view controller for the main render window.
  * It has a timer which calls update() on all the displays.
  * It creates and holds pointers to the other manager objects:
- * SelectionManager, FrameManager, the PropertyManagers, and Ogre::SceneManager.
+ * HandlerManager, SelectionManager, FrameManager, the PropertyManagers, and Ogre::SceneManager.
  *
  * The "protected" members should probably all be "private", as
  * VisualizationManager is not intended to be subclassed.
@@ -99,6 +101,7 @@ public:
    */
   explicit VisualizationManager(
     RenderPanel * render_panel,
+    ros_integration::RosNodeAbstractionIface::WeakPtr ros_node_abstraction,
     WindowManagerInterface * wm = 0,
     std::shared_ptr<tf2_ros::TransformListener> tf = nullptr,
     std::shared_ptr<tf2_ros::Buffer> buffer = nullptr,
@@ -109,7 +112,7 @@ public:
   /**
    * Stops the update of timers and destroys all displays, tools, and managers.
    */
-  virtual ~VisualizationManager();
+  ~VisualizationManager() override;
 
   /// Do initialization that was not done in constructor.
   /**
@@ -216,8 +219,15 @@ public:
   /// Resets the wall and ROS elapsed time to zero and calls resetDisplays().
   void resetTime();
 
+  /// Return a pointer to the HandlerManager
+  std::shared_ptr<rviz_common::interaction::HandlerManagerIface> getHandlerManager() const override;
+
   /// Return a pointer to the SelectionManager.
-  rviz_common::selection::SelectionManager * getSelectionManager() const override;
+  std::shared_ptr<rviz_common::interaction::SelectionManagerIface>
+  getSelectionManager() const override;
+
+  /// Return a pointer to the ViewPicker.
+  std::shared_ptr<rviz_common::interaction::ViewPickerIface> getViewPicker() const override;
 
   /// Return a pointer to the ToolManager.
   ToolManager * getToolManager() const override;
@@ -226,10 +236,10 @@ public:
   ViewManager * getViewManager() const override;
 
   /// Lock a mutex to delay calls to Ogre::Root::renderOneFrame().
-  void lockRender();
+  void lockRender() override;
 
   /// Unlock a mutex, allowing calls to Ogre::Root::renderOneFrame().
-  void unlockRender();
+  void unlockRender() override;
 
   /// Queues a render.
   /**
@@ -242,9 +252,7 @@ public:
   /// Return the window manager, if any.
   WindowManagerInterface * getWindowManager() const override;
 
-  void addNodeToMainExecutor(rclcpp::Node::SharedPtr) override;
-
-  void removeNodeFromMainExecutor(rclcpp::Node::SharedPtr) override;
+  ros_integration::RosNodeAbstractionIface::WeakPtr getRosNodeAbstraction() const override;
 
 #if 0
   /**
@@ -254,7 +262,7 @@ public:
 #endif
 
   /// Return the FrameManager instance.
-  FrameManager * getFrameManager() const override;
+  FrameManagerIface * getFrameManager() const override;
 
   /// Return the current value of the frame count.
   /**
@@ -290,7 +298,7 @@ public:
 
   virtual void setHelpPath(const QString & help_path);
 
-  virtual QString getHelpPath() const;
+  QString getHelpPath() const override;
 
   rclcpp::Clock::SharedPtr getClock() override;
 
@@ -324,8 +332,6 @@ protected:
   void updateTime();
 
   void updateFrames();
-
-  void createColorMaterials();
 
   void threadedQueueThreadFunc();
 
@@ -366,7 +372,9 @@ protected:
   float time_update_timer_;
   float frame_update_timer_;
 
-  rviz_common::selection::SelectionManager * selection_manager_;
+  std::shared_ptr<rviz_common::interaction::HandlerManagerIface> handler_manager_;
+  std::shared_ptr<rviz_common::interaction::SelectionManagerIface> selection_manager_;
+  std::shared_ptr<rviz_common::interaction::ViewPickerIface> view_picker_;
 
   uint32_t render_requested_;
   uint64_t frame_count_;
@@ -391,6 +399,7 @@ private:
   BitAllocator visibility_bit_allocator_;
   QString help_path_;
   rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node_;
 };
 
 }  // namespace rviz_common

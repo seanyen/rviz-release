@@ -27,19 +27,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include <vector>
 
 #include <QList>  // NOLINT: cpplint is unable to handle the include order here
 
 #include "rviz_common/properties/property.hpp"
-#include "../message_creators.hpp"
+#include "test/rviz_default_plugins/pointcloud_messages.hpp"
 
-// *INDENT-OFF*
-#include "../../../../../src/rviz_default_plugins/displays/pointcloud/transformers/flat_color_pc_transformer.hpp"
-// *INDENT-ON*
+#include "rviz_default_plugins/displays/pointcloud/transformers/flat_color_pc_transformer.hpp"
 
+using namespace ::testing;  // NOLINT
 using namespace rviz_default_plugins;  // NOLINT
 
 TEST(FlatColorPCTransformer, transform_colors_all_points_white_per_default) {
@@ -57,15 +56,15 @@ TEST(FlatColorPCTransformer, transform_colors_all_points_white_per_default) {
   FlatColorPCTransformer transformer;
   transformer.createProperties(nullptr, PointCloudTransformer::Support_Color, out_props);
 
-  ASSERT_EQ(out_props[0]->getName(), "Color");
+  ASSERT_THAT(out_props[0]->getNameStd(), StrEq("Color"));
   out_props[0]->setValue(QColor(Qt::red));
 
   transformer.transform(
     cloud, PointCloudTransformer::Support_Color, Ogre::Matrix4::IDENTITY, points_out);
 
-  ASSERT_EQ(points_out[0].color, Ogre::ColourValue(1, 0, 0));
-  ASSERT_EQ(points_out[1].color, Ogre::ColourValue(1, 0, 0));
-  ASSERT_EQ(points_out[2].color, Ogre::ColourValue(1, 0, 0));
+  ASSERT_THAT(points_out[0].color, Eq(Ogre::ColourValue(1, 0, 0)));
+  ASSERT_THAT(points_out[1].color, Eq(Ogre::ColourValue(1, 0, 0)));
+  ASSERT_THAT(points_out[2].color, Eq(Ogre::ColourValue(1, 0, 0)));
 }
 
 
@@ -86,7 +85,7 @@ TEST(FlatColorPCTransformer, transform_colors_all_points_in_the_given_color) {
   transformer.transform(
     cloud, PointCloudTransformer::Support_Color, Ogre::Matrix4::IDENTITY, points_out);
 
-  ASSERT_EQ(points_out[0].color, Ogre::ColourValue(1, 1, 1));
-  ASSERT_EQ(points_out[1].color, Ogre::ColourValue(1, 1, 1));
-  ASSERT_EQ(points_out[2].color, Ogre::ColourValue(1, 1, 1));
+  ASSERT_THAT(points_out[0].color, Eq(Ogre::ColourValue(1, 1, 1)));
+  ASSERT_THAT(points_out[1].color, Eq(Ogre::ColourValue(1, 1, 1)));
+  ASSERT_THAT(points_out[2].color, Eq(Ogre::ColourValue(1, 1, 1)));
 }

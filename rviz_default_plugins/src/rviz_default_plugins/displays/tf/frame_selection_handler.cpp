@@ -27,18 +27,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "frame_selection_handler.hpp"
+#include "rviz_default_plugins/displays/tf/frame_selection_handler.hpp"
 
 #include <string>
 
-#include "rviz_common/frame_manager.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
 #include "rviz_common/properties/bool_property.hpp"
 #include "rviz_common/properties/float_property.hpp"
 #include "rviz_common/properties/quaternion_property.hpp"
 #include "rviz_common/properties/string_property.hpp"
 #include "rviz_common/properties/vector_property.hpp"
 
-using rviz_common::selection::SelectionHandler;
+using rviz_common::interaction::SelectionHandler;
 using rviz_common::properties::BoolProperty;
 using rviz_common::properties::FloatProperty;
 using rviz_common::properties::StatusProperty;
@@ -46,7 +46,7 @@ using rviz_common::properties::StringProperty;
 using rviz_common::properties::Property;
 using rviz_common::properties::QuaternionProperty;
 using rviz_common::properties::VectorProperty;
-using rviz_common::selection::Picked;
+using rviz_common::interaction::Picked;
 
 namespace rviz_default_plugins
 {

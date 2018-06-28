@@ -33,17 +33,8 @@
 #include <cstdio>
 #include <string>
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
-
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
 
 #include <QApplication>  // NOLINT: cpplint is unable to handle the include order here
 #include <QColor>  // NOLINT: cpplint is unable to handle the include order here
@@ -57,6 +48,7 @@
 #include "rviz_rendering/apply_visibility_bits.hpp"
 
 #include "rviz_common/display_context.hpp"
+#include "rviz_common/logging.hpp"
 #include "rviz_common/panel_dock_widget.hpp"
 #include "rviz_common/properties/property_tree_model.hpp"
 #include "rviz_common/properties/status_list.hpp"
@@ -66,13 +58,13 @@ namespace rviz_common
 {
 
 Display::Display()
-: context_(0),
-  scene_node_(NULL),
-  status_(0),
+: context_(nullptr),
+  scene_node_(nullptr),
+  status_(nullptr),
   initialized_(false),
   visibility_bits_(0xFFFFFFFF),
-  associated_widget_(NULL),
-  associated_widget_panel_(NULL)
+  associated_widget_(nullptr),
+  associated_widget_panel_(nullptr)
 {
   // Needed for timeSignal (see header) to work across threads
   qRegisterMetaType<rclcpp::Time>();
@@ -224,6 +216,21 @@ void Display::setStatusStd(
   setStatus(level, QString::fromStdString(name), QString::fromStdString(text));
 }
 
+void Display::setMissingTransformToFixedFrame(
+  const std::string & frame, const std::string & additional_info)
+{
+  std::string error_string =
+    "Could not transform " + (additional_info.empty() ? "from [" : additional_info + " from [") +
+    frame + "] to [" + fixed_frame_.toStdString() + "]";
+  setStatusStd(properties::StatusProperty::Error, "Transform", error_string);
+  RVIZ_COMMON_LOG_DEBUG(error_string);
+}
+
+void Display::setTransformOk()
+{
+  setStatusStd(properties::StatusProperty::Ok, "Transform", "Ok");
+}
+
 void Display::deleteStatusStd(const std::string & name)
 {
   deleteStatus(QString::fromStdString(name));
@@ -235,6 +242,7 @@ void Display::setStatusInternal(int level, const QString & name, const QString &
 
   if (!status_) {
     status_ = new rviz_common::properties::StatusList("Status");
+    status_->setReadOnly(true);
     addChild(status_, 0);
   }
   StatusProperty::Level old_level = status_->getLevel();
@@ -406,11 +414,11 @@ void Display::setAssociatedWidget(QWidget * widget)
       connect(associated_widget_panel_, SIGNAL(closed()), this, SLOT(disable()));
       associated_widget_panel_->setIcon(getIcon());
     } else {
-      associated_widget_panel_ = NULL;
+      associated_widget_panel_ = nullptr;
       associated_widget_->setWindowTitle(getName());
     }
   } else {
-    associated_widget_panel_ = NULL;
+    associated_widget_panel_ = nullptr;
   }
 }
 
@@ -427,11 +435,7 @@ PanelDockWidget * Display::getAssociatedWidgetPanel()
 void Display::associatedPanelVisibilityChange(bool visible)
 {
   // if something external makes the panel visible, make sure we're enabled
-  if (visible) {
-    setEnabled(true);
-  } else {
-    setEnabled(false);
-  }
+  setEnabled(visible);
 }
 
 void Display::setIcon(const QIcon & icon)
@@ -474,6 +478,17 @@ void Display::setName(const QString & name)
   } else if (associated_widget_) {
     associated_widget_->setWindowTitle(name);
   }
+}
+
+properties::Property * Display::findProperty(const QString & name)
+{
+  for (int i = 0; i < numChildren(); i++) {
+    auto property = childAt(i);
+    if (property->getName() == name) {
+      return property;
+    }
+  }
+  return nullptr;
 }
 
 }  // namespace rviz_common

@@ -27,19 +27,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include <memory>
 #include <vector>
 
-#include <Ogre.h> // NOLINT
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
+
+#include <Ogre.h>  // NOLINT
+
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
 
 #include "sensor_msgs/image_encodings.hpp"
 
 #include "test/rviz_rendering/ogre_testing_environment.hpp"
 
-#include "../../../../src/rviz_default_plugins/displays/image/ros_image_texture.hpp"
+#include "include/rviz_default_plugins/displays/image/ros_image_texture.hpp"
 
 using namespace rviz_default_plugins::displays;  // NOLINT
 

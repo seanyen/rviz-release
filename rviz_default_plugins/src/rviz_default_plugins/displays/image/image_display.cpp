@@ -47,18 +47,24 @@
 #include "sensor_msgs/image_encodings.hpp"
 
 #include "rviz_common/display_context.hpp"
-#include "rviz_common/frame_manager.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
 #include "rviz_common/render_panel.hpp"
 #include "rviz_common/validate_floats.hpp"
 #include "rviz_common/uniform_string_stream.hpp"
+#include "rviz_rendering/material_manager.hpp"
 #include "rviz_rendering/render_window.hpp"
 
-#include "image_display.hpp"
+#include "rviz_default_plugins/displays/image/ros_image_texture.hpp"
+#include "rviz_default_plugins/displays/image/image_display.hpp"
+#include "rviz_default_plugins/displays/image/ros_image_texture_iface.hpp"
 
 namespace rviz_default_plugins
 {
 namespace displays
 {
+
+ImageDisplay::ImageDisplay()
+: ImageDisplay(std::make_unique<ROSImageTexture>()) {}
 
 ImageDisplay::ImageDisplay(std::unique_ptr<ROSImageTextureIface> texture)
 : queue_size_property_(std::make_unique<rviz_common::QueueSizeProperty>(this, 10)),
@@ -213,14 +219,11 @@ void ImageDisplay::setupScreenRectangle()
   screen_rect_->setCorners(-1.0f, 1.0f, 1.0f, -1.0f);
 
   ss << "Material";
-  material_ = Ogre::MaterialManager::getSingleton().create(
-    ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  material_ = rviz_rendering::MaterialManager::createMaterialWithNoLighting(ss.str());
   material_->setSceneBlending(Ogre::SBT_REPLACE);
   material_->setDepthWriteEnabled(false);
-  material_->setReceiveShadows(false);
   material_->setDepthCheckEnabled(false);
 
-  material_->getTechnique(0)->setLightingEnabled(false);
   Ogre::TextureUnitState * tu =
     material_->getTechnique(0)->getPass(0)->createTextureUnitState();
   tu->setTextureName(texture_->getName());
@@ -239,6 +242,10 @@ void ImageDisplay::setupRenderPanel()
   render_panel_->resize(640, 480);
   render_panel_->initialize(context_);
   setAssociatedWidget(render_panel_.get());
+
+  static int count = 0;
+  render_panel_->getRenderWindow()->setObjectName(
+    "ImageDisplayRenderWindow" + QString::number(count++));
 }
 
 }  // namespace displays

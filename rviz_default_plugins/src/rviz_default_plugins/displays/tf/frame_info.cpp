@@ -28,19 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "frame_info.hpp"
+#include "include/rviz_default_plugins/displays/tf/frame_info.hpp"
 
 #include <algorithm>
 
 #include <OgreSceneNode.h>
 
-#include "rviz_rendering/arrow.hpp"
-#include "rviz_rendering/axes.hpp"
-#include "rviz_rendering/movable_text.hpp"
+#include "rviz_rendering/objects/arrow.hpp"
+#include "rviz_rendering/objects/axes.hpp"
+#include "rviz_rendering/objects/movable_text.hpp"
 #include "rviz_common/display_context.hpp"
 #include "rviz_common/properties/vector_property.hpp"
 #include "rviz_common/properties/quaternion_property.hpp"
-#include "frame_selection_handler.hpp"
+#include "include/rviz_default_plugins/displays/tf/frame_selection_handler.hpp"
 
 namespace rviz_default_plugins
 {
@@ -217,7 +217,8 @@ void FrameInfo::updateParentArrow(
 
   Ogre::Quaternion orient = Ogre::Vector3::NEGATIVE_UNIT_Z.getRotationTo(direction);
 
-  if (!orient.isNaN()) {
+  if (direction.squaredLength() > 0 && !orient.isNaN()) {
+    setParentArrowVisible(true);
     distance_to_parent_ = distance;
     float head_length = (distance < 0.1f * scale) ? (0.1f * scale * distance) : 0.1f * scale;
     float shaft_length = distance - head_length;
@@ -227,6 +228,8 @@ void FrameInfo::updateParentArrow(
 
     parent_arrow_->setPosition(position);
     parent_arrow_->setOrientation(orient);
+  } else {
+    setParentArrowVisible(false);
   }
 }
 

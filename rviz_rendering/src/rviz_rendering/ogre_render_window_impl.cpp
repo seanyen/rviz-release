@@ -33,21 +33,18 @@
 #include <cstdlib>
 #include <functional>
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunused-parameter"
-# ifdef __clang__
-#   pragma clang diagnostic ignored "-Wextra-semi"
-# else
-#  pragma GCC diagnostic ignored "-Wpedantic"
-# endif
-#else
+#ifdef _WIN32
 # pragma warning(push)
 # pragma warning(disable:4996)
 #endif
 
-#include <OgreCamera.h>
 #include <OgreEntity.h>
+
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
+
+#include <OgreCamera.h>
 #include <OgreGpuProgramManager.h>
 #include <OgreMaterialManager.h>
 #include <OgreRenderWindow.h>
@@ -59,17 +56,9 @@
 #include <OgreViewport.h>
 #include <OgreWindowEventUtilities.h>
 
-// #include <OgreRenderTargetListener.h>
-
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#else
-# pragma warning(pop)
-#endif
-
-#include "./orthographic.hpp"
+#include "rviz_rendering/orthographic.hpp"
 #include "./render_system.hpp"
-#include "rviz_rendering/grid.hpp"
+#include "rviz_rendering/objects/grid.hpp"
 #include "rviz_rendering/logging.hpp"
 
 namespace rviz_rendering
@@ -109,9 +98,17 @@ RenderWindowImpl::RenderWindowImpl(QWindow * parent)
 
 RenderWindowImpl::~RenderWindowImpl()
 {
-  Ogre::Root::getSingletonPtr()->detachRenderTarget(ogre_render_window_);
-  ogre_render_window_->destroy();
-  // enableStereo(false);  // free stereo resources
+  if (ogre_render_window_) {
+    Ogre::Root::getSingletonPtr()->detachRenderTarget(ogre_render_window_);
+    Ogre::Root::getSingletonPtr()->destroyRenderTarget(ogre_render_window_);
+    // enableStereo(false);  // free stereo resources
+  }
+}
+
+void
+RenderWindowImpl::screenShot(Ogre::String imageName)
+{
+  ogre_render_window_->writeContentsToFile(imageName);
 }
 
 void
@@ -498,8 +495,7 @@ void RenderWindowImpl::setCameraAspectRatio()
     // }
 
     if (ogre_camera_->getProjectionType() == Ogre::PT_ORTHOGRAPHIC) {
-      Ogre::Matrix4 proj;
-      buildScaledOrthoMatrix(proj,
+      Ogre::Matrix4 proj = buildScaledOrthoMatrix(
         -width / ortho_scale_ / 2, width / ortho_scale_ / 2,
         -height / ortho_scale_ / 2, height / ortho_scale_ / 2,
         ogre_camera_->getNearClipDistance(), ogre_camera_->getFarClipDistance());

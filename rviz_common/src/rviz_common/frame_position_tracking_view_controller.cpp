@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +45,7 @@
 #endif
 
 #include "rviz_common/display_context.hpp"
-#include "rviz_common/frame_manager.hpp"
+#include "frame_manager.hpp"
 #include "rviz_common/properties/enum_property.hpp"
 #include "rviz_common/properties/tf_frame_property.hpp"
 #include "rviz_common/view_manager.hpp"
@@ -54,14 +55,17 @@ namespace rviz_common
 {
 
 FramePositionTrackingViewController::FramePositionTrackingViewController()
-: target_scene_node_(NULL)
+: target_scene_node_(nullptr),
+  reference_orientation_(Ogre::Quaternion::IDENTITY),
+  reference_position_(Ogre::Vector3::ZERO),
+  camera_scene_node_(nullptr)
 {
   target_frame_property_ = new rviz_common::properties::TfFrameProperty(
     "Target Frame",
     rviz_common::properties::TfFrameProperty::FIXED_FRAME_STRING,
     "TF frame whose motion this view will follow.",
     this,
-    NULL,
+    nullptr,
     true);
 }
 
@@ -147,6 +151,7 @@ void FramePositionTrackingViewController::mimic(ViewController * source_view)
   QVariant target_frame = source_view->subProp("Target Frame")->getValue();
   if (target_frame.isValid()) {
     target_frame_property_->setValue(target_frame);
+    getNewTransform();
   }
 }
 

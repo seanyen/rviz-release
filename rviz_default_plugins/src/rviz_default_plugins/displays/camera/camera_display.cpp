@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "camera_display.hpp"
+#include "rviz_default_plugins/displays/camera/camera_display.hpp"
 
 #include <memory>
 #include <string>
@@ -45,11 +45,12 @@
 #include <OgreTechnique.h>
 #include <OgreCamera.h>
 
-#include "rviz_rendering/axes.hpp"
+#include "rviz_rendering/material_manager.hpp"
+#include "rviz_rendering/objects/axes.hpp"
 #include "rviz_rendering/render_window.hpp"
 
 #include "rviz_common/bit_allocator.hpp"
-#include "rviz_common/frame_manager.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
 #include "rviz_common/logging.hpp"
 #include "rviz_common/properties/display_group_visibility_property.hpp"
 #include "rviz_common/properties/enum_property.hpp"
@@ -62,6 +63,8 @@
 #include "rviz_common/validate_floats.hpp"
 #include "rviz_common/display_context.hpp"
 #include "rviz_common/load_resource.hpp"
+
+#include "rviz_default_plugins/displays/image/ros_image_texture.hpp"
 
 namespace rviz_default_plugins
 {
@@ -145,7 +148,7 @@ void CameraDisplay::onInitialize()
     "Changes the visibility of other Displays in the camera view.");
 
   visibility_property_->setIcon(
-    rviz_common::loadPixmap("package://rviz/icons/visibility.svg", true));
+    rviz_common::loadPixmap("package://rviz_default_plugins/icons/visibility.svg", true));
 
   this->addChild(visibility_property_, 0);
 }
@@ -188,8 +191,11 @@ void CameraDisplay::setupRenderPanel()
   render_panel_ = std::make_unique<rviz_common::RenderPanel>();
   render_panel_->resize(640, 480);
   render_panel_->initialize(context_, true);
-
   setAssociatedWidget(render_panel_.get());
+
+  static int count = 0;
+  render_panel_->getRenderWindow()->setObjectName(
+    "CameraDisplayRenderWindow" + QString::number(count++));
 }
 
 std::unique_ptr<Ogre::Rectangle2D> CameraDisplay::createScreenRectangle(
@@ -208,17 +214,13 @@ std::unique_ptr<Ogre::Rectangle2D> CameraDisplay::createScreenRectangle(
 
 Ogre::MaterialPtr CameraDisplay::createMaterial(std::string name) const
 {
-  auto material = Ogre::MaterialManager::getSingleton().create(
-    name, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
+  auto material = rviz_rendering::MaterialManager::createMaterialWithNoLighting(name);
   material->setDepthWriteEnabled(false);
-  material->setReceiveShadows(false);
   material->setDepthCheckEnabled(false);
 
   material->setCullingMode(Ogre::CULL_NONE);
   material->setSceneBlending(Ogre::SBT_REPLACE);
 
-  material->getTechnique(0)->setLightingEnabled(false);
   Ogre::TextureUnitState * tu =
     material->getTechnique(0)->getPass(0)->createTextureUnitState();
   tu->setTextureName(texture_->getTexture()->getName());
@@ -277,7 +279,9 @@ void CameraDisplay::subscribe()
 void CameraDisplay::createCameraInfoSubscription()
 {
   try {
-    caminfo_sub_ = node_->create_subscription<sensor_msgs::msg::CameraInfo>(
+    // TODO(anhosi,wjwwood): replace with abstraction for subscriptions one available
+    caminfo_sub_ = rviz_ros_node_.lock()->get_raw_node()->
+      template create_subscription<sensor_msgs::msg::CameraInfo>(
       topic_property_->getTopicStd() + "/camera_info",
       [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr msg) {
         std::unique_lock<std::mutex> lock(caminfo_mutex_);
@@ -328,7 +332,7 @@ void CameraDisplay::clear()
     "Topic may not exist.");
 
   rviz_rendering::RenderWindowOgreAdapter::getOgreCamera(
-    render_panel_->getRenderWindow())->setPosition(Ogre::Vector3(999999, 999999, 999999));
+    render_panel_->getRenderWindow())->setPosition(rviz_common::RenderPanel::default_camera_pose_);
 }
 
 void CameraDisplay::update(float wall_dt, float ros_dt)
@@ -356,7 +360,14 @@ bool CameraDisplay::updateCamera()
     image = texture_->getImage();
   }
 
-  if (!info || !image) {
+  if (!image) {
+    return false;
+  }
+
+  if (!info) {
+    setStatus(StatusLevel::Warn, CAM_INFO_STATUS,
+      "Expecting Camera Info on topic [" + topic_property_->getTopic() + "/camera_info" + "]. "
+      "No CameraInfo received. Topic may not exist.");
     return false;
   }
 
@@ -375,8 +386,13 @@ bool CameraDisplay::updateCamera()
 
   Ogre::Vector3 position;
   Ogre::Quaternion orientation;
-  context_->getFrameManager()->getTransform(
-    image->header.frame_id, image->header.stamp, position, orientation);
+  if (!context_->getFrameManager()->getTransform(
+      image->header.frame_id, image->header.stamp, position, orientation))
+  {
+    setMissingTransformToFixedFrame(image->header.frame_id);
+    return false;
+  }
+  setTransformOk();
 
   // convert vision (Z-forward) frame to ogre frame (Z-out)
   orientation = orientation * Ogre::Quaternion(Ogre::Degree(180), Ogre::Vector3::UNIT_X);
@@ -427,7 +443,7 @@ bool CameraDisplay::updateCamera()
 bool CameraDisplay::timeDifferenceInExactSyncMode(
   const sensor_msgs::msg::Image::ConstSharedPtr & image, rclcpp::Time & rviz_time) const
 {
-  return context_->getFrameManager()->getSyncMode() == rviz_common::FrameManager::SyncExact &&
+  return context_->getFrameManager()->getSyncMode() == rviz_common::FrameManagerIface::SyncExact &&
          rviz_time != image->header.stamp;
 }
 

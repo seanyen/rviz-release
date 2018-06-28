@@ -35,12 +35,12 @@
 #include <memory>
 #include <sstream>
 
+#include "rviz_common/factory/pluginlib_factory.hpp"
 #include "rviz_common/logging.hpp"
 #include "rviz_common/properties/property_tree_model.hpp"
 #include "rviz_common/render_panel.hpp"
 
 #include "./failed_view_controller.hpp"
-#include "./pluginlib_factory.hpp"
 
 namespace rviz_common
 {
@@ -81,7 +81,7 @@ ViewManager::~ViewManager()
 
 void ViewManager::initialize()
 {
-  setCurrent(create("rviz/Orbit"), false);
+  setCurrent(create("rviz_default_plugins/Orbit"), false);
 }
 
 void ViewManager::update(float wall_dt, float ros_dt)

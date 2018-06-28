@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,40 +31,32 @@
 
 #include "visualization_frame.hpp"
 
+#include <exception>
 #include <fstream>
 #include <memory>
 #include <string>
 #include <utility>
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-
 #include <OgreRenderWindow.h>
 #include <OgreMeshManager.h>
 #include <OgreMaterialManager.h>
 
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
-#include <QApplication>
-#include <QCloseEvent>
-#include <QDesktopServices>
-#include <QDir>
-#include <QFile>
-#include <QFileDialog>
-#include <QHBoxLayout>
-#include <QMenu>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QShortcut>
-#include <QSplashScreen>
-#include <QStatusBar>
-#include <QTimer>
-#include <QToolBar>
-#include <QToolButton>
+#include <QApplication>  // NOLINT cpplint cannot handle include order here
+#include <QCloseEvent>  // NOLINT cpplint cannot handle include order here
+#include <QDesktopServices>  // NOLINT cpplint cannot handle include order here
+#include <QDir>  // NOLINT cpplint cannot handle include order here
+#include <QFile>  // NOLINT cpplint cannot handle include order here
+#include <QFileDialog>  // NOLINT cpplint cannot handle include order here
+#include <QHBoxLayout>  // NOLINT cpplint cannot handle include order here
+#include <QMenu>  // NOLINT cpplint cannot handle include order here
+#include <QMenuBar>  // NOLINT cpplint cannot handle include order here
+#include <QMessageBox>  // NOLINT cpplint cannot handle include order here
+#include <QShortcut>  // NOLINT cpplint cannot handle include order here
+#include <QSplashScreen>  // NOLINT cpplint cannot handle include order here
+#include <QStatusBar>  // NOLINT cpplint cannot handle include order here
+#include <QTimer>  // NOLINT cpplint cannot handle include order here
+#include <QToolBar>  // NOLINT cpplint cannot handle include order here
+#include <QToolButton>  // NOLINT cpplint cannot handle include order here
 
 #include "rclcpp/clock.hpp"
 #include "tf2_ros/buffer.h"
@@ -71,17 +64,16 @@
 
 #include "rviz_common/load_resource.hpp"
 #include "rviz_common/logging.hpp"
+#include "rviz_common/panel.hpp"
+#include "rviz_common/panel_dock_widget.hpp"
 #include "rviz_common/render_panel.hpp"
 #include "rviz_common/tool.hpp"
-#include "rviz_rendering/initialization.hpp"  // TODO(wjwwood): see if this is needed anymore
 #include "rviz_rendering/render_window.hpp"
 
 #include "./env_config.hpp"
 #include "./failed_panel.hpp"
 #include "./loading_dialog.hpp"
 #include "./new_object_dialog.hpp"
-#include "./panel.hpp"
-#include "rviz_common/panel_dock_widget.hpp"
 #include "./panel_factory.hpp"
 #include "./screenshot_dialog.hpp"
 #include "./splash_screen.hpp"
@@ -92,8 +84,8 @@
 #include "./yaml_config_writer.hpp"
 
 // #include "./displays_panel.hpp"
-// #include "./help_panel.hpp"
-// #include "./selection/selection_manager.hpp"
+#include "./help_panel.hpp"
+// #include "./interaction/selection_manager.hpp"
 // #include "./selection_panel.hpp"
 // #include "./time_panel.hpp"
 // #include "./tool_properties_panel.hpp"
@@ -106,27 +98,30 @@
 namespace rviz_common
 {
 
-VisualizationFrame::VisualizationFrame(const std::string & node_name, QWidget * parent)
+VisualizationFrame::VisualizationFrame(
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node, QWidget * parent)
 : QMainWindow(parent),
-  app_(NULL),
-  render_panel_(NULL),
-  show_help_action_(NULL),
-  file_menu_(NULL),
-  recent_configs_menu_(NULL),
-  toolbar_(NULL),
-  manager_(NULL),
-  splash_(NULL),
-  toolbar_actions_(NULL),
+  app_(nullptr),
+  render_panel_(nullptr),
+  show_help_action_(nullptr),
+  file_menu_(nullptr),
+  recent_configs_menu_(nullptr),
+  toolbar_(nullptr),
+  manager_(nullptr),
+  splash_(nullptr),
+  toolbar_actions_(nullptr),
   show_choose_new_master_option_(false),
-  panel_factory_(new PanelFactory(node_name)),
-  add_tool_action_(NULL),
-  remove_tool_menu_(NULL),
+  panel_factory_(nullptr),
+  add_tool_action_(nullptr),
+  remove_tool_menu_(nullptr),
   initialized_(false),
   geom_change_detector_(new WidgetGeometryChangeDetector(this)),
   loading_(false),
   post_load_timer_(new QTimer(this)),
-  frame_count_(0)
+  frame_count_(0),
+  rviz_ros_node_(rviz_ros_node)
 {
+  setObjectName("VisualizationFrame");
   installEventFilter(geom_change_detector_);
   connect(geom_change_detector_, SIGNAL(changed()), this, SLOT(setDisplayConfigModified()));
 
@@ -136,10 +131,10 @@ VisualizationFrame::VisualizationFrame(const std::string & node_name, QWidget * 
   package_path_ = ament_index_cpp::get_package_share_directory("rviz_common");
   QDir help_path(QString::fromStdString(package_path_) + "/help/help.html");
   help_path_ = help_path.absolutePath();
-  QDir splash_path(QString::fromStdString(package_path_) + "images/splash.png");
+  QDir splash_path(QString::fromStdString(package_path_) + "/images/splash.png");
   splash_path_ = splash_path.absolutePath();
 
-  QToolButton * reset_button = new QToolButton();
+  auto * reset_button = new QToolButton();
   reset_button->setText("Reset");
   reset_button->setContentsMargins(0, 0, 0, 0);
   statusBar()->addPermanentWidget(reset_button, 0);
@@ -160,14 +155,19 @@ VisualizationFrame::VisualizationFrame(const std::string & node_name, QWidget * 
 
 VisualizationFrame::~VisualizationFrame()
 {
-  delete render_panel_;
   delete manager_;
+  delete render_panel_;
 
-  for (int i = 0; i < custom_panels_.size(); i++) {
-    delete custom_panels_[i].dock;
+  for (auto & custom_panel : custom_panels_) {
+    delete custom_panel.dock;
   }
 
   delete panel_factory_;
+}
+
+rviz_rendering::RenderWindow * VisualizationFrame::getRenderWindow()
+{
+  return render_panel_->getRenderWindow();
 }
 
 void VisualizationFrame::setApp(QApplication * app)
@@ -242,7 +242,9 @@ void VisualizationFrame::setSplashPath(const QString & splash_path)
   splash_path_ = splash_path;
 }
 
-void VisualizationFrame::initialize(const QString & display_config_file)
+void VisualizationFrame::initialize(
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
+  const QString & display_config_file)
 {
   initConfigs();
 
@@ -250,7 +252,7 @@ void VisualizationFrame::initialize(const QString & display_config_file)
 
   QDir app_icon_path(QString::fromStdString(package_path_) + "/icons/package.png");
   QIcon app_icon(app_icon_path.absolutePath());
-  setWindowIcon(app_icon);
+  app_->setWindowIcon(app_icon);
 
   if (splash_path_ != "") {
     QPixmap splash_image(splash_path_);
@@ -323,12 +325,15 @@ void VisualizationFrame::initialize(const QString & display_config_file)
   //                render_panel and VisualizationManager
   render_panel_->getRenderWindow()->initialize();
 
-  auto buffer = std::make_shared<tf2_ros::Buffer>();
   auto clock = std::make_shared<rclcpp::Clock>(RCL_ROS_TIME);
-  // TODO(wjwwood): pass the rviz node so tf2 doesn't create it's own...
-  auto tf_listener = std::make_shared<tf2_ros::TransformListener>(*buffer);
-  manager_ = new VisualizationManager(render_panel_, this, tf_listener, buffer, clock);
+  auto buffer = std::make_shared<tf2_ros::Buffer>();
+  buffer->setUsingDedicatedThread(true);
+  auto tf_listener = std::make_shared<tf2_ros::TransformListener>(
+    *buffer, rviz_ros_node.lock()->get_raw_node(), false);
+  manager_ = new VisualizationManager(
+    render_panel_, rviz_ros_node, this, tf_listener, buffer, clock);
   manager_->setHelpPath(help_path_);
+  panel_factory_ = new PanelFactory(rviz_ros_node_, manager_);
 
   // Periodically process events for the splash screen.
   if (app_) {app_->processEvents();}
@@ -361,7 +366,7 @@ void VisualizationFrame::initialize(const QString & display_config_file)
   if (app_) {app_->processEvents();}
 
   delete splash_;
-  splash_ = 0;
+  splash_ = nullptr;
 
   manager_->startUpdate();
   initialized_ = true;
@@ -519,7 +524,7 @@ void VisualizationFrame::initToolbars()
 
   add_tool_action_ = new QAction("", toolbar_actions_);
   add_tool_action_->setToolTip("Add a new tool");
-  add_tool_action_->setIcon(loadPixmap("package://rviz/icons/plus.png"));
+  add_tool_action_->setIcon(loadPixmap("package://rviz_common/icons/plus.png"));
   toolbar_->addAction(add_tool_action_);
   connect(add_tool_action_, SIGNAL(triggered()), this, SLOT(openNewToolDialog()));
 
@@ -528,7 +533,7 @@ void VisualizationFrame::initToolbars()
   remove_tool_button->setMenu(remove_tool_menu_);
   remove_tool_button->setPopupMode(QToolButton::InstantPopup);
   remove_tool_button->setToolTip("Remove a tool from the toolbar");
-  remove_tool_button->setIcon(loadPixmap("package://rviz/icons/minus.png"));
+  remove_tool_button->setIcon(loadPixmap("package://rviz_common/icons/minus.png"));
   toolbar_->addWidget(remove_tool_button);
   connect(remove_tool_menu_, SIGNAL(triggered(QAction *)), this, SLOT(onToolbarRemoveTool(
       QAction *)));
@@ -696,7 +701,7 @@ void VisualizationFrame::loadDisplayConfig(const QString & qpath)
   setWindowModified(false);
   loading_ = true;
 
-  LoadingDialog * dialog = NULL;
+  LoadingDialog * dialog = nullptr;
   if (initialized_) {
     dialog = new LoadingDialog(this);
     dialog->show();
@@ -707,7 +712,11 @@ void VisualizationFrame::loadDisplayConfig(const QString & qpath)
   Config config;
   reader.readFile(config, QString::fromStdString(actual_load_path));
   if (!reader.error()) {
-    load(config);
+    try {
+      load(config);
+    } catch (const std::exception & e) {
+      RVIZ_COMMON_LOG_ERROR_STREAM("Could not load display config: " << e.what());
+    }
   }
 
   markRecentConfig(path);
@@ -959,7 +968,7 @@ void VisualizationFrame::onOpen()
   manager_->startUpdate();
 
   if (!filename.isEmpty()) {
-    if (!QDir(filename).exists()) {
+    if (!QFile(filename).exists()) {
       QString message = filename + " does not exist!";
       QMessageBox::critical(this, "Config file does not exist", message);
       return;
@@ -1115,25 +1124,17 @@ void VisualizationFrame::indicateToolIsCurrent(Tool * tool)
 void VisualizationFrame::showHelpPanel()
 {
   if (!show_help_action_) {
-    // TODO(wjwwood): reenable this when plugin loading is fixed.
-#if 0
-    QDockWidget * dock = addPanelByName("Help", "rviz/Help");
+    QDockWidget * dock = addPanelByName("Help", "rviz_common/Help");
     show_help_action_ = dock->toggleViewAction();
     connect(dock, SIGNAL(destroyed(QObject *)), this, SLOT(onHelpDestroyed()));
-#endif
   } else {
-    // TODO(wjwwood): figure out if this is needed
-    // show_help_action_ is a toggle action, so trigger() changes its
-    // state.  Therefore we must force it to the opposite state from
-    // what we want before we call trigger().  (I think.)
-    show_help_action_->setChecked(false);
     show_help_action_->trigger();
   }
 }
 
 void VisualizationFrame::onHelpDestroyed()
 {
-  show_help_action_ = NULL;
+  show_help_action_ = nullptr;
 }
 
 void VisualizationFrame::onHelpWiki()

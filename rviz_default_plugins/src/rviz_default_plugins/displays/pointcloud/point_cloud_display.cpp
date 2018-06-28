@@ -27,16 +27,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "point_cloud_display.hpp"
+#include "rviz_default_plugins/displays/pointcloud/point_cloud_display.hpp"
 
 #include <memory>
 #include <utility>
 
 #include <OgreSceneNode.h>
 
-#include "./point_cloud_common.hpp"
+#include "rviz_default_plugins/displays/pointcloud/point_cloud_common.hpp"
 #include "rviz_common/display_context.hpp"
-#include "rviz_common/frame_manager.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
 #include "rviz_common/properties/int_property.hpp"
 #include "rviz_common/properties/queue_size_property.hpp"
 
@@ -53,7 +53,6 @@ PointCloudDisplay::PointCloudDisplay()
 void PointCloudDisplay::onInitialize()
 {
   RTDClass::onInitialize();
-  topic_property_->setValue("pointcloud");
   point_cloud_common_->initialize(context_, scene_node_);
 }
 
@@ -71,6 +70,12 @@ void PointCloudDisplay::reset()
 {
   RTDClass::reset();
   point_cloud_common_->reset();
+}
+
+void PointCloudDisplay::onDisable()
+{
+  RosTopicDisplay::onDisable();
+  point_cloud_common_->onDisable();
 }
 
 }  // namespace displays

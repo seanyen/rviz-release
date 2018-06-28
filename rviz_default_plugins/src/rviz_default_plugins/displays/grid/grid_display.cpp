@@ -28,30 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "./grid_display.hpp"
+#include "rviz_default_plugins/displays/grid/grid_display.hpp"
 
 #include <cstdint>
 #include <memory>
 #include <string>
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
 
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
 #include "rviz_common/display_context.hpp"
-#include "rviz_common/frame_manager.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
 #include "rviz_common/properties/parse_color.hpp"
 #include "rviz_common/properties/property.hpp"
-#include "rviz_common/selection/selection_manager.hpp"
-#include "rviz_rendering/grid.hpp"
+#include "rviz_common/interaction/selection_manager.hpp"
+#include "rviz_rendering/objects/grid.hpp"
 
 namespace rviz_default_plugins
 {
@@ -154,15 +145,11 @@ void GridDisplay::update(float dt, float ros_dt)
   if (context_->getFrameManager()->getTransform(frame, position, orientation)) {
     scene_node_->setPosition(position);
     scene_node_->setOrientation(orientation);
-    setStatus(StatusProperty::Ok, "Transform", "Transform OK");
+    setTransformOk();
+    grid_->getSceneNode()->setVisible(true);
   } else {
-    std::string error;
-    if (context_->getFrameManager()->transformHasProblems(frame, error)) {
-      setStatus(StatusProperty::Error, "Transform", QString::fromStdString(error));
-    } else {
-      setStatus(StatusProperty::Error, "Transform",
-        "Could not transform from [" + qframe + "] to [" + fixed_frame_ + "]");
-    }
+    setMissingTransformToFixedFrame(qframe.toStdString());
+    grid_->getSceneNode()->setVisible(false);
   }
 }
 

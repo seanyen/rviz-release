@@ -28,26 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ogre_logging.hpp"
+#include "rviz_rendering/ogre_logging.hpp"
 
 #include <string>
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# ifdef __clang__
-#  pragma clang diagnostic ignored "-Wextra-semi"
-#  pragma clang diagnostic ignored "-Wkeyword-macro"
-# else
-#  pragma GCC diagnostic ignored "-Wpedantic"
-# endif
-#endif
-
 #include <OgreLogManager.h>
 #include <OgreLog.h>
-
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
 
 #include "rviz_rendering/logging.hpp"
 
@@ -95,14 +81,19 @@ public:
 namespace rviz_rendering
 {
 
-// OgreLogging::Preference OgreLogging::preference_ = OgreLogging::NoLogging;
-OgreLogging::Preference OgreLogging::preference_ = OgreLogging::StandardOut;
+OgreLogging::Preference OgreLogging::preference_ = OgreLogging::NoLogging;
 // TODO(wjwwood): refactor this to not have static members.
 std::string OgreLogging::filename_;  // NOLINT: cpplint doesn't allow static strings
 
 void OgreLogging::useLogFile(const std::string & filename)
 {
   preference_ = FileLogging;
+  filename_ = filename;
+}
+
+void OgreLogging::useLogFileAndStandardOut(const std::string & filename)
+{
+  preference_ = StandardOut;
   filename_ = filename;
 }
 
@@ -125,8 +116,7 @@ void OgreLogging::configureLogging()
 
   // Printing to standard out is what Ogre does if you don't do any LogManager calls.
   if (preference_ == StandardOut) {
-    // ll.min_lml = Ogre::LML_NORMAL;
-    ll.min_lml = Ogre::LML_TRIVIAL;
+    ll.min_lml = Ogre::LML_NORMAL;
   }
   // cppcheck-suppress memleak
 }

@@ -27,7 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include <memory>
@@ -47,7 +46,7 @@
 #include "../../mock_display_context.hpp"
 #include "../../mock_window_manager_interface.hpp"
 
-#include "../../../../src/rviz_default_plugins/displays/image/image_display.hpp"
+#include "rviz_default_plugins/displays/image/image_display.hpp"
 
 using namespace ::testing;  // NOLINT
 using namespace rviz_default_plugins::displays;  // NOLINT
@@ -61,7 +60,7 @@ public:
     testing_environment_->setUpOgreTestEnvironment();
   }
 
-  void SetUp() override
+  ImageDisplayTestFixture()
   {
     texture_ = std::make_unique<MockROSImageTexture>();
     ON_CALL(*texture_, getName()).WillByDefault(Return("texture"));

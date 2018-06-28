@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "./move_tool.hpp"
+#include "rviz_default_plugins/tools/move/move_tool.hpp"
 
 #include "rviz_common/display_context.hpp"
 #include "rviz_common/load_resource.hpp"
@@ -47,11 +47,10 @@ MoveTool::MoveTool()
 {
   shortcut_key_ = 'm';
   // this is needed as the move tool is instantiated by other tools
-  setIcon(rviz_common::loadPixmap("package://rviz/icons/classes/MoveCamera.png"));
+  setIcon(rviz_common::loadPixmap("package://rviz_default_plugins/icons/classes/MoveCamera.png"));
 }
 
-MoveTool::~MoveTool()
-{}
+MoveTool::~MoveTool() = default;
 
 void MoveTool::activate()
 {}

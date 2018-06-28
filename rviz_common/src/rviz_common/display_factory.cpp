@@ -38,13 +38,6 @@
 #include "include/rviz_common/display_group.hpp"
 #include "rviz_common/logging.hpp"
 
-// TODO(wjwwood): remove this block (within if-endif) once plugins moved to default plugins package
-#if 1
-
-#include "./temp/default_plugins/displays/robot_model_display.hpp"
-
-#endif
-
 namespace rviz_common
 {
 
@@ -53,21 +46,10 @@ static Display * newDisplayGroup()
   return new DisplayGroup();
 }
 
-// TODO(wjwwood): remove this block (within if-endif) once plugins moved to default plugins package
-#if 0
-
-static Display * newRobotModelDisplay()
-{
-  return new rviz_common::RobotModelDisplay();
-}
-
-#endif
-
 DisplayFactory::DisplayFactory()
 : PluginlibFactory<Display>("rviz_common", "rviz_common::Display")
 {
-  addBuiltInClass("rviz", "Group", "A container for Displays", &newDisplayGroup);
-  // addBuiltInClass("rviz", "RobotModel", "robot model display", &newRobotModelDisplay);
+  addBuiltInClass("rviz_common", "Group", "A container for Displays", &newDisplayGroup);
 }
 
 Display * DisplayFactory::makeRaw(const QString & class_id, QString * error_return)

@@ -30,7 +30,7 @@
 
 #include "rviz_common/view_controller.hpp"
 
-#include <sstream>
+#include <string>
 
 #ifndef _WIN32
 # pragma GCC diagnostic push
@@ -45,10 +45,8 @@
 # pragma GCC diagnostic pop
 #endif
 
-#include <QColor>
 #include <QFont>
 #include <QKeyEvent>
-#include <Qt>
 
 #include "rviz_rendering/render_window.hpp"
 
@@ -56,7 +54,7 @@
 #include "rviz_common/load_resource.hpp"
 #include "rviz_common/properties/bool_property.hpp"
 #include "rviz_common/properties/float_property.hpp"
-#include "rviz_common/selection/selection_manager.hpp"
+#include "rviz_common/interaction/view_picker_iface.hpp"
 #include "rviz_common/render_panel.hpp"
 
 namespace rviz_common
@@ -66,10 +64,10 @@ using properties::BoolProperty;
 using properties::FloatProperty;
 
 ViewController::ViewController()
-: context_(NULL),
-  camera_(NULL),
+: context_(nullptr),
+  camera_(nullptr),
   is_active_(false),
-  type_property_(NULL)
+  type_property_(nullptr)
 {
   near_clip_property_ = new FloatProperty(
     "Near Clip Distance", 0.01f,
@@ -101,10 +99,9 @@ void ViewController::initialize(DisplayContext * context)
 {
   context_ = context;
 
-  std::stringstream ss;
   static int count = 0;
-  ss << "ViewControllerCamera" << count++;
-  camera_ = context_->getSceneManager()->createCamera(ss.str());
+  camera_ = context_->getSceneManager()->createCamera(
+    "ViewControllerCamera" + std::to_string(count++));
   context_->getSceneManager()->getRootSceneNode()->attachObject(camera_);
 
   setValue(formatClassId(getClassId()));
@@ -116,12 +113,12 @@ void ViewController::initialize(DisplayContext * context)
   cursor_ = getDefaultCursor();
 
   standard_cursors_[Default] = getDefaultCursor();
-  standard_cursors_[Rotate2D] = makeIconCursor("package://rviz/icons/rotate.svg");
-  standard_cursors_[Rotate3D] = makeIconCursor("package://rviz/icons/rotate_cam.svg");
-  standard_cursors_[MoveXY] = makeIconCursor("package://rviz/icons/move2d.svg");
-  standard_cursors_[MoveZ] = makeIconCursor("package://rviz/icons/move_z.svg");
-  standard_cursors_[Zoom] = makeIconCursor("package://rviz/icons/zoom.svg");
-  standard_cursors_[Crosshair] = makeIconCursor("package://rviz/icons/crosshair.svg");
+  standard_cursors_[Rotate2D] = makeIconCursor("package://rviz_common/icons/rotate.svg");
+  standard_cursors_[Rotate3D] = makeIconCursor("package://rviz_common/icons/rotate_cam.svg");
+  standard_cursors_[MoveXY] = makeIconCursor("package://rviz_common/icons/move2d.svg");
+  standard_cursors_[MoveZ] = makeIconCursor("package://rviz_common/icons/move_z.svg");
+  standard_cursors_[Zoom] = makeIconCursor("package://rviz_common/icons/zoom.svg");
+  standard_cursors_[Crosshair] = makeIconCursor("package://rviz_common/icons/crosshair.svg");
 
   updateNearClipDistance();
   updateStereoProperties();
@@ -227,12 +224,10 @@ void ViewController::save(Config config) const
 
 void ViewController::handleKeyEvent(QKeyEvent * event, RenderPanel * panel)
 {
-  Ogre::Viewport * viewport =
-    rviz_rendering::RenderWindowOgreAdapter::getOgreViewport(panel->getRenderWindow());
-  if (event->key() == Qt::Key_F && viewport && context_->getSelectionManager()) {
+  if (event->key() == Qt::Key_F && context_->getViewPicker()) {
     QPoint mouse_rel_panel = panel->mapFromGlobal(QCursor::pos());
     Ogre::Vector3 point_rel_world;  // output of get3DPoint().
-    if (context_->getSelectionManager()->get3DPoint(viewport,
+    if (context_->getViewPicker()->get3DPoint(panel,
       mouse_rel_panel.x(), mouse_rel_panel.y(),
       point_rel_world))
     {
@@ -291,6 +286,11 @@ QCursor ViewController::getCursor()
   return cursor_;
 }
 
+FocalPointStatus ViewController::getFocalPointStatus()
+{
+  return FocalPointStatus();
+}
+
 void ViewController::setStatus(const QString & message)
 {
   if (context_) {
@@ -300,8 +300,7 @@ void ViewController::setStatus(const QString & message)
 
 void ViewController::updateNearClipDistance()
 {
-  float n = near_clip_property_->getFloat();
-  camera_->setNearClipDistance(n);
+  camera_->setNearClipDistance(near_clip_property_->getFloat());
 }
 
 void ViewController::updateStereoProperties()

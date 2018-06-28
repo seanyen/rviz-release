@@ -39,7 +39,7 @@
 #include <QDialog>  // NOLINT: cpplint is unable to handle the include order here
 #include <QTreeWidget>  // NOLINT: cpplint is unable to handle the include order here
 
-#include "./factory.hpp"
+#include "rviz_common/factory/factory.hpp"
 #include "rviz_common/ros_integration/ros_node_abstraction_iface.hpp"
 
 class QCheckBox;
@@ -90,7 +90,7 @@ public:
     const QStringList & disallowed_display_names,
     const QStringList & disallowed_class_lookup_names,
     QString * lookup_name_output,
-    const std::string & node_name,
+    ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
     QString * display_name_output = 0,
     QString * topic_output = 0,
     QString * datatype_output = 0,
@@ -178,8 +178,7 @@ class TopicDisplayWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit TopicDisplayWidget(
-    std::unique_ptr<rviz_common::ros_integration::RosNodeAbstractionIface> ros_node_abstraction);
+  explicit TopicDisplayWidget(ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node);
   void fill(DisplayFactory * factory);
 
 Q_SIGNALS:
@@ -207,7 +206,7 @@ private:
   // Map from ROS topic type to all displays that can visualize it.
   // One key may have multiple values.
   QMap<QString, QString> datatype_plugins_;
-  std::unique_ptr<rviz_common::ros_integration::RosNodeAbstractionIface> ros_node_abstraction_;
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node_;
 };
 
 /// A combo box that can be inserted into a QTreeWidgetItem.

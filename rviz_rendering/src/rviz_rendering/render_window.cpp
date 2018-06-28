@@ -44,24 +44,16 @@
 
 #include "rviz_rendering/render_window.hpp"
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-
 #include <OgreCamera.h>
 
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
+#include <string>
 
-#include <QMouseEvent>
-#include <QTimer>
-#include <QWindow>
-
-#include <QMetaEnum>
-#include <QDebug>
-#include <QTime>
+#include <QMouseEvent>  // NOLINT
+#include <QTimer>   // NOLINT
+#include <QWindow>   // NOLINT
+#include <QMetaEnum>   // NOLINT
+#include <QDebug>   // NOLINT
+#include <QTime>   // NOLINT
 
 // Use the Ogre implementation for now.
 // This header will implement the RenderWindowImpl class.
@@ -80,6 +72,11 @@ RenderWindow::RenderWindow(QWindow * parent)
 RenderWindow::~RenderWindow()
 {
   delete impl_;
+}
+
+void RenderWindow::captureScreenShot(std::string imageName)
+{
+  impl_->screenShot(imageName);
 }
 
 void
@@ -118,6 +115,12 @@ void
 RenderWindow::setupSceneAfterInit(setupSceneCallback setup_scene_callback)
 {
   impl_->setupSceneAfterInit(setup_scene_callback);
+}
+
+void RenderWindow::windowMovedOrResized()
+{
+  // It seems that the 'width' and 'height' parameters of the resize() method don't play a role here
+  impl_->resize(0, 0);
 }
 
 void
@@ -235,7 +238,7 @@ RenderWindowOgreAdapter::getOgreCamera(RenderWindow * render_window)
 Ogre::Viewport *
 RenderWindowOgreAdapter::getOgreViewport(RenderWindow * render_window)
 {
-  return render_window->impl_->getViewport();
+  return render_window ? render_window->impl_->getViewport() : nullptr;
 }
 
 void

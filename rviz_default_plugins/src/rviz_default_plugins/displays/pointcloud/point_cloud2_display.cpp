@@ -27,18 +27,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "point_cloud2_display.hpp"
+#include "rviz_default_plugins/displays/pointcloud/point_cloud2_display.hpp"
 
 #include <memory>
 
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 
-#include "point_cloud_common.hpp"
-#include "point_cloud_helpers.hpp"
+#include "rviz_default_plugins/displays/pointcloud/point_cloud_common.hpp"
+#include "rviz_default_plugins/displays/pointcloud/point_cloud_helpers.hpp"
 #include "rviz_common/display_context.hpp"
-#include "rviz_common/frame_manager.hpp"
-#include "rviz_rendering/point_cloud.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
+#include "rviz_rendering/objects/point_cloud.hpp"
 #include "rviz_common/properties/int_property.hpp"
 #include "rviz_common/validate_floats.hpp"
 #include "rviz_common/properties/queue_size_property.hpp"
@@ -57,7 +57,6 @@ PointCloud2Display::PointCloud2Display()
 void PointCloud2Display::onInitialize()
 {
   RTDClass::onInitialize();
-  topic_property_->setValue("pointcloud2");
   point_cloud_common_->initialize(context_, scene_node_);
 }
 
@@ -182,6 +181,12 @@ void PointCloud2Display::reset()
 {
   RTDClass::reset();
   point_cloud_common_->reset();
+}
+
+void PointCloud2Display::onDisable()
+{
+  RosTopicDisplay::onDisable();
+  point_cloud_common_->onDisable();
 }
 
 }  // namespace displays

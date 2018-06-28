@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,41 +46,51 @@
 #include "rviz_common/properties/property.hpp"
 #include "rviz_common/properties/property_tree_widget.hpp"
 #include "rviz_common/properties/property_tree_with_help.hpp"
+#include "rviz_common/ros_integration/ros_node_abstraction_iface.hpp"
 #include "./visualization_manager.hpp"
 
 namespace rviz_common
 {
 
-DisplaysPanel::DisplaysPanel(const std::string & node_name, QWidget * parent)
-: Panel(parent), node_name_(node_name)
+DisplaysPanel::DisplaysPanel(
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
+  VisualizationManager * manager,
+  QWidget * parent)
+: Panel(parent), vis_manager_(manager), rviz_ros_node_(rviz_ros_node)
 {
+  setObjectName("Displays/DisplayPanel");
   tree_with_help_ = new properties::PropertyTreeWithHelp;
+  tree_with_help_->setObjectName("DisplayPanel/TreeWithHelp");
   property_grid_ = tree_with_help_->getTree();
 
   QPushButton * add_button = new QPushButton("Add");
+  add_button->setObjectName("DisplayPanel/AddDisplayButton");
   add_button->setShortcut(QKeySequence(QString("Ctrl+N")));
   add_button->setToolTip("Add a new display, Ctrl+N");
   duplicate_button_ = new QPushButton("Duplicate");
+  duplicate_button_->setObjectName("DisplayPanel/DuplicateDisplayButton");
   duplicate_button_->setShortcut(QKeySequence(QString("Ctrl+D")));
   duplicate_button_->setToolTip("Duplicate a display, Ctrl+D");
   duplicate_button_->setEnabled(false);
   remove_button_ = new QPushButton("Remove");
+  remove_button_->setObjectName("DisplayPanel/RemoveDisplayButton");
   remove_button_->setShortcut(QKeySequence(QString("Ctrl+X")));
   remove_button_->setToolTip("Remove displays, Ctrl+X");
   remove_button_->setEnabled(false);
   rename_button_ = new QPushButton("Rename");
+  rename_button_->setObjectName("DisplayPanel/RenameDisplayButton");
   rename_button_->setShortcut(QKeySequence(QString("Ctrl+R")));
   rename_button_->setToolTip("Rename a display, Ctrl+R");
   rename_button_->setEnabled(false);
 
-  QHBoxLayout * button_layout = new QHBoxLayout;
+  auto button_layout = new QHBoxLayout;
   button_layout->addWidget(add_button);
   button_layout->addWidget(duplicate_button_);
   button_layout->addWidget(remove_button_);
   button_layout->addWidget(rename_button_);
   button_layout->setContentsMargins(2, 0, 2, 2);
 
-  QVBoxLayout * layout = new QVBoxLayout;
+  auto layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 2);
   layout->addWidget(tree_with_help_);
   layout->addLayout(button_layout);
@@ -91,10 +102,6 @@ DisplaysPanel::DisplaysPanel(const std::string & node_name, QWidget * parent)
   connect(remove_button_, SIGNAL(clicked(bool)), this, SLOT(onDeleteDisplay()));
   connect(rename_button_, SIGNAL(clicked(bool)), this, SLOT(onRenameDisplay()));
   connect(property_grid_, SIGNAL(selectionHasChanged()), this, SLOT(onSelectionChanged()));
-}
-
-DisplaysPanel::~DisplaysPanel()
-{
 }
 
 void DisplaysPanel::onInitialize()
@@ -117,7 +124,7 @@ void DisplaysPanel::onNewDisplay()
     empty,
     empty,
     &lookup_name,
-    node_name_,
+    rviz_ros_node_,
     &display_name,
     &topic,
     &datatype);
@@ -141,19 +148,19 @@ void DisplaysPanel::onDuplicateDisplay()
 
   QList<Display *> duplicated_displays;
 
-  for (int i = 0; i < displays_to_duplicate.size(); i++) {
+  for (const auto & display_to_duplicate : displays_to_duplicate) {
     // initialize display
-    QString lookup_name = displays_to_duplicate[i]->getClassId();
-    QString display_name = displays_to_duplicate[i]->getName();
+    QString lookup_name = display_to_duplicate->getClassId();
+    QString display_name = display_to_duplicate->getName();
     Display * disp = vis_manager_->createDisplay(lookup_name, display_name, true);
     // duplicate config
     Config config;
-    displays_to_duplicate[i]->save(config);
+    display_to_duplicate->save(config);
     disp->load(config);
     duplicated_displays.push_back(disp);
   }
   // make sure the newly duplicated displays are selected.
-  if (duplicated_displays.size() > 0) {
+  if (!duplicated_displays.isEmpty()) {
     QModelIndex first = property_grid_->getModel()->indexOf(duplicated_displays.front());
     QModelIndex last = property_grid_->getModel()->indexOf(duplicated_displays.back());
     QItemSelection selection(first, last);
@@ -202,7 +209,7 @@ void DisplaysPanel::onSelectionChanged()
 void DisplaysPanel::onRenameDisplay()
 {
   QList<Display *> displays = property_grid_->getSelectedObjects<Display>();
-  if (displays.size() == 0) {
+  if (displays.isEmpty()) {
     return;
   }
   Display * display_to_rename = displays[0];

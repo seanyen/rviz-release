@@ -66,13 +66,14 @@
 // #include "tf/transform_listener.h"
 #include "rclcpp/clock.hpp"
 #include "rclcpp/time.hpp"
+#include "rviz_rendering/material_manager.hpp"
 #include "rviz_rendering/render_window.hpp"
 
 #include "rviz_common/display.hpp"
 #include "./display_factory.hpp"
-#include "include/rviz_common/display_group.hpp"
+#include "rviz_common/display_group.hpp"
 #include "./displays_panel.hpp"
-#include "rviz_common/frame_manager.hpp"
+#include "frame_manager.hpp"
 #include "rviz_common/load_resource.hpp"
 // #include "./ogre_helpers/ogre_render_queue_clearer.hpp"
 // #include "./ogre_helpers/qt_ogre_render_window.hpp"
@@ -85,7 +86,12 @@
 #include "rviz_common/properties/status_list.hpp"
 #include "rviz_common/properties/tf_frame_property.hpp"
 #include "rviz_common/render_panel.hpp"
-#include "rviz_common/selection/selection_manager.hpp"
+#include "rviz_common/interaction/handler_manager.hpp"
+#include "rviz_common/interaction/handler_manager_iface.hpp"
+#include "rviz_common/interaction/selection_manager.hpp"
+#include "rviz_common/interaction/selection_manager_iface.hpp"
+#include "rviz_common/interaction/view_picker.hpp"
+#include "rviz_common/interaction/view_picker_iface.hpp"
 #include "rviz_common/tool.hpp"
 #include "./tool_manager.hpp"
 // #include "rviz_common/view_controller.hpp"
@@ -103,8 +109,10 @@ using rviz_common::properties::PropertyTreeModel;
 using rviz_common::properties::StatusList;
 using rviz_common::properties::StatusProperty;
 using rviz_common::properties::TfFrameProperty;
-using rviz_common::selection::SelectionManager;
-using rviz_common::selection::M_Picked;
+using rviz_common::interaction::HandlerManager;
+using rviz_common::interaction::SelectionManager;
+using rviz_common::interaction::ViewPicker;
+using rviz_common::interaction::M_Picked;
 
 // helper class needed to display an icon besides "Global Options"
 class IconizedProperty : public rviz_common::properties::Property
@@ -141,6 +149,7 @@ public:
 
 VisualizationManager::VisualizationManager(
   RenderPanel * render_panel,
+  ros_integration::RosNodeAbstractionIface::WeakPtr ros_node_abstraction,
   WindowManagerInterface * wm,
   std::shared_ptr<tf2_ros::TransformListener> tf,
   std::shared_ptr<tf2_ros::Buffer> buffer,
@@ -156,7 +165,8 @@ VisualizationManager::VisualizationManager(
   window_manager_(wm),
   clock_(clock),
   private_(new VisualizationManagerPrivate),
-  executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>())
+  executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>()),
+  rviz_ros_node_(ros_node_abstraction)
 {
   // visibility_bit_allocator_ is listed after default_visibility_bit_
   // (and thus initialized later be default):
@@ -192,7 +202,7 @@ VisualizationManager::VisualizationManager(
 
   IconizedProperty * ip =
     new IconizedProperty("Global Options", QVariant(), "", root_display_group_);
-  ip->setIcon(loadPixmap("package://rviz/icons/options.png"));
+  ip->setIcon(loadPixmap("package://rviz_common/icons/options.png"));
   global_options_ = ip;
 
   fixed_frame_property_ = new TfFrameProperty("Fixed Frame", "base_link",
@@ -216,11 +226,15 @@ VisualizationManager::VisualizationManager(
   updateBackgroundColor();
 
   global_status_ = new StatusList("Global Status", root_display_group_);
+  global_status_->setReadOnly(true);
 
-  createColorMaterials();
+  rviz_rendering::MaterialManager::createDefaultColorMaterials();
 
-  selection_manager_ = new SelectionManager(this);
+  handler_manager_ = std::make_shared<HandlerManager>();
+  selection_manager_ = std::make_shared<SelectionManager>(this);
+  view_picker_ = std::make_shared<ViewPicker>(this);
 
+  executor_->add_node(rviz_ros_node_.lock()->get_raw_node());
 // TODO(wjwwood): redo with executors?
 #if 0
   private_->threaded_queue_threads_.create_thread(std::bind(&VisualizationManager::
@@ -248,14 +262,9 @@ VisualizationManager::~VisualizationManager()
   private_->threaded_queue_threads_.join_all();
 #endif
 
-  if (selection_manager_) {
-    selection_manager_->setSelection(M_Picked());
-  }
-
   delete display_property_tree_model_;
   delete tool_manager_;
   delete display_factory_;
-  delete selection_manager_;
   delete frame_manager_;
   delete private_;
 
@@ -271,6 +280,7 @@ void VisualizationManager::initialize()
 
   view_manager_->initialize();
   selection_manager_->initialize();
+  view_picker_->initialize();
   tool_manager_->initialize();
 
   last_update_ros_time_ = clock_->now();
@@ -294,14 +304,10 @@ void VisualizationManager::unlockRender()
   private_->render_mutex_.unlock();
 }
 
-void VisualizationManager::addNodeToMainExecutor(rclcpp::Node::SharedPtr node)
+ros_integration::RosNodeAbstractionIface::WeakPtr
+VisualizationManager::getRosNodeAbstraction() const
 {
-  executor_->add_node(node);
-}
-
-void VisualizationManager::removeNodeFromMainExecutor(rclcpp::Node::SharedPtr node)
-{
-  executor_->remove_node(node);
+  return rviz_ros_node_;
 }
 
 #if 0
@@ -322,35 +328,6 @@ void VisualizationManager::stopUpdate()
   update_timer_->stop();
 }
 
-void createColorMaterial(
-  const std::string & name,
-  const Ogre::ColourValue & color,
-  bool use_self_illumination)
-{
-  // TODO(wjwwood): since this "group" is actually provided by rviz_rendering,
-  //                figure out how to abstract resource loading to an rviz_rendering API
-  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(name, "rviz_rendering");
-  mat->setAmbient(color * 0.5f);
-  mat->setDiffuse(color);
-  if (use_self_illumination) {
-    mat->setSelfIllumination(color);
-  }
-  mat->setLightingEnabled(true);
-  mat->setReceiveShadows(false);
-}
-
-void VisualizationManager::createColorMaterials()
-{
-  createColorMaterial("RVIZ/Red", Ogre::ColourValue(1.0f, 0.0f, 0.0f, 1.0f), true);
-  createColorMaterial("RVIZ/Green", Ogre::ColourValue(0.0f, 1.0f, 0.0f, 1.0f), true);
-  createColorMaterial("RVIZ/Blue", Ogre::ColourValue(0.0f, 0.0f, 1.0f, 1.0f), true);
-  createColorMaterial("RVIZ/Cyan", Ogre::ColourValue(0.0f, 1.0f, 1.0f, 1.0f), true);
-  createColorMaterial("RVIZ/ShadedRed", Ogre::ColourValue(1.0f, 0.0f, 0.0f, 1.0f), false);
-  createColorMaterial("RVIZ/ShadedGreen", Ogre::ColourValue(0.0f, 1.0f, 0.0f, 1.0f), false);
-  createColorMaterial("RVIZ/ShadedBlue", Ogre::ColourValue(0.0f, 0.0f, 1.0f, 1.0f), false);
-  createColorMaterial("RVIZ/ShadedCyan", Ogre::ColourValue(0.0f, 1.0f, 1.0f, 1.0f), false);
-}
-
 void VisualizationManager::queueRender()
 {
   render_requested_ = 1;
@@ -361,7 +338,7 @@ WindowManagerInterface * VisualizationManager::getWindowManager() const
   return window_manager_;
 }
 
-FrameManager * VisualizationManager::getFrameManager() const
+FrameManagerIface * VisualizationManager::getFrameManager() const
 {
   return frame_manager_;
 }
@@ -524,9 +501,22 @@ void VisualizationManager::resetTime()
   queueRender();
 }
 
-SelectionManager * VisualizationManager::getSelectionManager() const
+std::shared_ptr<rviz_common::interaction::HandlerManagerIface>
+VisualizationManager::getHandlerManager() const
+{
+  return handler_manager_;
+}
+
+std::shared_ptr<rviz_common::interaction::SelectionManagerIface>
+VisualizationManager::getSelectionManager() const
 {
   return selection_manager_;
+}
+
+std::shared_ptr<rviz_common::interaction::ViewPickerIface>
+VisualizationManager::getViewPicker() const
+{
+  return view_picker_;
 }
 
 ToolManager * VisualizationManager::getToolManager() const
@@ -654,6 +644,7 @@ void VisualizationManager::handleMouseEvent(const ViewportMouseEvent & vme)
 #endif
     flags = current_tool->processMouseEvent(_vme);
     vme.panel->setCursor(current_tool->getCursor());
+    vme.panel->getRenderWindow()->setCursor(current_tool->getCursor());
   } else {
     vme.panel->setCursor(QCursor(Qt::ArrowCursor));
   }

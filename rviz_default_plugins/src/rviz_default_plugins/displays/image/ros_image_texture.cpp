@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ros_image_texture.hpp"
+#include "include/rviz_default_plugins/displays/image/ros_image_texture.hpp"
 
 #include <algorithm>
 #include <deque>
@@ -40,7 +40,7 @@
 #include <vector>
 #include <utility>
 
-#include <OgreTextureManager.h> // NOLINT: cpplint cannot handle include order
+#include <OgreTextureManager.h>  // NOLINT: cpplint cannot handle include order
 
 #include "sensor_msgs/image_encodings.hpp"
 
@@ -58,13 +58,13 @@ ROSImageTexture::ROSImageTexture()
   height_(0),
   median_frames_(5)
 {
-  empty_image_.load("no_image.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  empty_image_.load("no_image.png", "rviz_rendering");
 
   static uint32_t count = 0;
   rviz_common::UniformStringStream ss;
   ss << "ROSImageTexture" << count++;
   texture_ = Ogre::TextureManager::getSingleton().loadImage(
-    ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, empty_image_,
+    ss.str(), "rviz_rendering", empty_image_,
     Ogre::TEX_TYPE_2D,
     0);
 

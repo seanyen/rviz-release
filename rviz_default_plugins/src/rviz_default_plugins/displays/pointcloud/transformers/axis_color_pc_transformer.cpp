@@ -35,9 +35,9 @@
 #include "rviz_common/properties/editable_enum_property.hpp"
 #include "rviz_common/properties/color_property.hpp"
 #include "rviz_common/properties/bool_property.hpp"
-#include "../point_cloud_helpers.hpp"
+#include "rviz_default_plugins/displays/pointcloud/point_cloud_helpers.hpp"
 
-#include "./axis_color_pc_transformer.hpp"
+#include "rviz_default_plugins/displays/pointcloud/transformers/axis_color_pc_transformer.hpp"
 
 namespace rviz_default_plugins
 {
@@ -183,6 +183,11 @@ void AxisColorPCTransformer::updateAutoComputeBounds()
     auto_compute_bounds_property_->expand();
   }
   Q_EMIT needRetransform();
+}
+
+void AxisColorPCTransformer::hideUnusedProperties()
+{
+  updateAutoComputeBounds();
 }
 
 }  // end namespace rviz_default_plugins

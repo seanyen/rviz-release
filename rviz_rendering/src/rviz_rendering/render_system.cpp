@@ -44,24 +44,15 @@
 
 #endif
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-
 #include <OgreRenderWindow.h>
-
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
 
 #include "ament_index_cpp/get_resource.hpp"
 #include "ament_index_cpp/get_resources.hpp"
 #include "rviz_rendering/logging.hpp"
+#include "rviz_rendering/ogre_logging.hpp"
 #include "rviz_rendering/resource_config.hpp"
 
 #include "string_helper.hpp"
-#include "ogre_logging.hpp"
 
 namespace rviz_rendering
 {
@@ -195,7 +186,6 @@ void
 RenderSystem::loadOgrePlugins()
 {
   std::string plugin_prefix = get_ogre_plugin_directory();
-
 #if defined _WIN32 && !NDEBUG
   ogre_root_->loadPlugin(plugin_prefix + "RenderSystem_GL_d");
 #else
@@ -433,7 +423,9 @@ RenderSystem::makeRenderWindow(
 
   params["currentGLContext"] = Ogre::String("false");
 
-  params["externalWindowHandle"] = Ogre::StringConverter::toString(window_id);
+  if (window_id != 0) {
+    params["externalWindowHandle"] = Ogre::StringConverter::toString(window_id);
+  }
   params["parentWindowHandle"] = Ogre::StringConverter::toString(window_id);
 
   // Scale rendering window correctly on Windows
@@ -457,6 +449,7 @@ RenderSystem::makeRenderWindow(
   params["macAPI"] = "cocoa";
   params["macAPICocoaUseNSView"] = "true";
 #endif
+  // The parameter 'contentScalingFactor' is declared iOS specific, therefore useless at the moment.
   params["contentScalingFactor"] = std::to_string(pixel_ratio);
 
   std::ostringstream stream;

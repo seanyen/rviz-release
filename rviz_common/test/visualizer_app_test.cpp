@@ -27,7 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include <memory>
@@ -41,7 +40,8 @@ class MockRosNodeStorage : public rviz_common::ros_integration::RosClientAbstrac
 {
 public:
   MOCK_METHOD4(init,
-    std::string(int argc, char ** argv, const std::string & name, bool anonymous_name));
+    rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr(
+      int argc, char ** argv, const std::string & name, bool anonymous_name));
   MOCK_METHOD0(ok, bool());
   MOCK_METHOD0(shutdown, void());
 };

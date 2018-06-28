@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,38 +35,42 @@
 
 // TODO(wjwwood): reenable the remaining panels
 #include "./displays_panel.hpp"
-// #include "./help_panel.hpp"
-// #include "./selection_panel.hpp"
+#include "./help_panel.hpp"
+#include "./selection_panel.hpp"
 // #include "./time_panel.hpp"
-// #include "./tool_properties_panel.hpp"
+#include "./tool_properties_panel.hpp"
 #include "./views_panel.hpp"
+#include "./visualization_manager.hpp"
+#include "rviz_common/ros_integration/ros_node_abstraction_iface.hpp"
 
 namespace rviz_common
 {
 
-// static Panel * newHelpPanel() {return new HelpPanel();}
-// static Panel * newSelectionPanel() {return new SelectionPanel();}
+static Panel * newHelpPanel() {return new HelpPanel();}
+static Panel * newSelectionPanel() {return new SelectionPanel();}
 // static Panel * newTimePanel() {return new TimePanel();}
-// static Panel * newToolPropertiesPanel() {return new ToolPropertiesPanel();}
+static Panel * newToolPropertiesPanel() {return new ToolPropertiesPanel();}
 static Panel * newViewsPanel() {return new ViewsPanel();}
 
-PanelFactory::PanelFactory(const std::string & node_name)
+PanelFactory::PanelFactory(
+  ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
+  VisualizationManager * manager)
 : PluginlibFactory<Panel>("rviz_common", "rviz_common::Panel")
 {
-  addBuiltInClass("rviz", "Displays",
+  addBuiltInClass("rviz_common", "Displays",
     "Show and edit the list of Displays",
-    [&node_name]() -> Panel * {
-      return new DisplaysPanel(node_name, nullptr);
+    [rviz_ros_node, manager]() -> Panel * {
+      return new DisplaysPanel(rviz_ros_node, manager, nullptr);
     });
-  // addBuiltInClass("rviz", "Help",
-  //   "Show the key and mouse bindings", &newHelpPanel);
-  // addBuiltInClass("rviz", "Selection",
-  //   "Show properties of selected objects", &newSelectionPanel);
+  addBuiltInClass("rviz_common", "Help",
+    "Show the key and mouse bindings", &newHelpPanel);
+  addBuiltInClass("rviz_common", "Selection",
+    "Show properties of selected objects", &newSelectionPanel);
   // addBuiltInClass("rviz", "Time",
   //   "Show the current time", &newTimePanel);
-  // addBuiltInClass("rviz", "Tool Properties",
-  //   "Show and edit properties of tools", &newToolPropertiesPanel);
-  addBuiltInClass("rviz", "Views",
+  addBuiltInClass("rviz_common", "Tool Properties",
+    "Show and edit properties of tools", &newToolPropertiesPanel);
+  addBuiltInClass("rviz_common", "Views",
     "Show and edit viewpoints", &newViewsPanel);
 }
 
