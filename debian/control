@@ -1,0 +1,12 @@
+Source: ros-bouncy-rviz-visual-testing-framework
+Section: misc
+Priority: extra
+Maintainer: William Woodall <william@openrobotics.org>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-bouncy-ament-cmake, ros-bouncy-ament-cmake-cppcheck, ros-bouncy-ament-cmake-cpplint, ros-bouncy-ament-cmake-gmock, ros-bouncy-ament-cmake-gtest, ros-bouncy-ament-cmake-lint-cmake, ros-bouncy-ament-cmake-uncrustify, ros-bouncy-rviz-common, ros-bouncy-ros-workspace
+Homepage: http://ros.org/wiki/rviz2
+Standards-Version: 3.9.2
+
+Package: ros-bouncy-rviz-visual-testing-framework
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-bouncy-ament-cmake-gtest, ros-bouncy-rviz-common, ros-bouncy-ros-workspace
+Description: 3D testing framework for RViz.
