@@ -1,6 +1,6 @@
 <package format="2">
   <name>rviz_visual_testing_framework</name>
-  <version>4.0.0</version>
+  <version>4.0.1</version>
   <description>
     3D testing framework for RViz.
   </description>
@@ -14,6 +14,8 @@
   <url type="bugtracker">https://github.com/ros-visualization/rviz/issues</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <build_depend>qtbase5-dev</build_depend>
 
   <depend>rviz_common</depend>
   <depend>ament_cmake_gtest</depend>
