@@ -1,4 +1,4 @@
-From 250ab90a41d8dad011332e6070c316b529169985 Mon Sep 17 00:00:00 2001
+From 54303f372c28572e8c31ae9e0047729d7e93b07c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
 Date: Thu, 8 Feb 2018 12:16:49 -0800
 Subject: [PATCH] Tell shlibdeps where to find vendor libraries.
@@ -21,5 +21,5 @@ index 9c9604d..ebc5f61 100755
  override_dh_auto_install:
  	# In case we're installing to a non-standard location, look for a setup.sh
 -- 
-2.17.1
+2.18.0
 
