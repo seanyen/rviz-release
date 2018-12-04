@@ -1,6 +1,4 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -29,55 +27,36 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_COMMON__FACTORY__FACTORY_HPP_
-#define RVIZ_COMMON__FACTORY__FACTORY_HPP_
+#ifndef RVIZ_COMMON__PROPERTIES__GROUPED_CHECKBOX_PROPERTY_GROUP_HPP_
+#define RVIZ_COMMON__PROPERTIES__GROUPED_CHECKBOX_PROPERTY_GROUP_HPP_
 
-#include <utility>
 #include <vector>
 
-#include <QIcon>  // NOLINT
-#include <QString>  // NOLINT
-#include <QStringList>  // NOLINT
+#include "rviz_common/properties/grouped_checkbox_property.hpp"
 
 namespace rviz_common
 {
-
-/// Struct to bundle the information available for a plugin
-struct PluginInfo
+namespace properties
 {
-  QString id;
-  QString name;
-  QString package;
-  QString description;
-  QIcon icon;
 
-  friend bool operator==(const PluginInfo & lhs, const PluginInfo & rhs)
-  {
-    return lhs.id == rhs.id;
-  }
-
-  friend bool operator<(const PluginInfo & lhs, const PluginInfo & rhs)
-  {
-    return lhs.id < rhs.id;
-  }
-};
-
-/// Abstract base class representing a plugin load-able class factory.
-/**
- * The class represents the ability to get a list of class IDs and the ability
- * to get name, description, and package strings for each.
- * Actually instantiating objects must be done by subclasses specialized for
- * specific types.
- */
-class Factory
+/// Groups multiple GroupedCheckboxProperties together.
+class GroupedCheckboxPropertyGroup
 {
 public:
-  virtual ~Factory() {}
+  void
+  addProperty(GroupedCheckboxProperty * property);
 
-  virtual std::vector<PluginInfo> getDeclaredPlugins() = 0;
-  virtual PluginInfo getPluginInfo(const QString & class_id) const = 0;
+  GroupedCheckboxProperty *
+  getChecked();
+
+  void
+  setChecked(GroupedCheckboxProperty * property_to_check);
+
+private:
+  std::vector<GroupedCheckboxProperty *> properties_;
 };
 
+}  // namespace properties
 }  // namespace rviz_common
 
-#endif  // RVIZ_COMMON__FACTORY__FACTORY_HPP_
+#endif  // RVIZ_COMMON__PROPERTIES__GROUPED_CHECKBOX_PROPERTY_GROUP_HPP_
