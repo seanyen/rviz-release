@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
+ * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,46 +27,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_INITIAL_POSE_TOOL_H
-#define RVIZ_INITIAL_POSE_TOOL_H
+#include "rviz_common/properties/grouped_checkbox_property.hpp"
+#include "rviz_common/properties/grouped_checkbox_property_group.hpp"
 
-#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-# include <QObject>
-
-# include <ros/ros.h>
-
-# include "rviz/default_plugin/tools/pose_tool.h"
-#endif
-
-namespace rviz
+namespace rviz_common
 {
-class Arrow;
-class DisplayContext;
-class StringProperty;
-
-class InitialPoseTool: public PoseTool
+namespace properties
 {
-Q_OBJECT
-public:
-  InitialPoseTool();
-  virtual ~InitialPoseTool() {}
-  virtual void onInitialize();
 
-protected:
-  virtual void onPoseSet(double x, double y, double theta);
-
-private Q_SLOTS:
-  void updateTopic();
-
-private:
-  ros::NodeHandle nh_;
-  ros::Publisher pub_;
-
-  StringProperty* topic_property_;
-};
-
+void GroupedCheckboxPropertyGroup::addProperty(GroupedCheckboxProperty * property)
+{
+  properties_.push_back(property);
 }
 
-#endif
+void GroupedCheckboxPropertyGroup::setChecked(GroupedCheckboxProperty * property_to_check)
+{
+  for (const auto & property : properties_) {
+    if (property) {
+      property->setRawValue(property == property_to_check);
+    }
+  }
+}
 
+GroupedCheckboxProperty * GroupedCheckboxPropertyGroup::getChecked()
+{
+  for (const auto & property : properties_) {
+    if (property && property->getValue().toBool()) {
+      return property;
+    }
+  }
+  return nullptr;
+}
 
+}  // namespace properties
+}  // namespace rviz_common

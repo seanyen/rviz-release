@@ -7,8 +7,20 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
+# Tests currently only run on OS X @ OSRF jenkins
+# Enable on Linux by providing a display, enable on Windows via EnableDisplayTests=True
 option(EnableDisplayTests "EnableDisplayTests")
 set(DisplayTests "False" CACHE STRING "DisplayTestsVariable")
+
+if(DEFINED ENV{DISPLAY})
+  set(DISPLAYPRESENT TRUE)
+endif()
+
+if(APPLE OR DISPLAYPRESENT OR EnableDisplayTests STREQUAL "True")
+  message(STATUS "Enabling tests requiring a display")
+else()
+  set(SKIP_DISPLAY_TESTS "SKIP_TEST")
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
@@ -36,7 +48,6 @@ find_package(rclcpp REQUIRED)
 find_package(resource_retriever REQUIRED)
 find_package(rviz_assimp_vendor REQUIRED)
 find_package(rviz_rendering REQUIRED)
-find_package(rviz_yaml_cpp_vendor REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(tinyxml_vendor REQUIRED)
@@ -44,6 +55,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(urdf REQUIRED)
+find_package(yaml_cpp_vendor REQUIRED)
 
 find_package(TinyXML REQUIRED)  # provided by tinyxml_vendor
 
@@ -76,6 +88,7 @@ set(rviz_common_headers_to_moc
   src/rviz_common/displays_panel.hpp
   src/rviz_common/failed_panel.hpp
   src/rviz_common/frame_manager.hpp
+  include/rviz_common/transformation/frame_transformer.hpp
   include/rviz_common/frame_manager_iface.hpp
   src/rviz_common/loading_dialog.hpp
   src/rviz_common/new_object_dialog.hpp
@@ -92,6 +105,8 @@ set(rviz_common_headers_to_moc
   include/rviz_common/properties/editable_enum_property.hpp
   include/rviz_common/properties/float_edit.hpp
   include/rviz_common/properties/float_property.hpp
+  include/rviz_common/properties/grouped_checkbox_property.hpp
+  include/rviz_common/properties/grouped_checkbox_property_group.hpp
   include/rviz_common/properties/int_property.hpp
   include/rviz_common/properties/line_edit_with_button.hpp
   include/rviz_common/properties/property.hpp
@@ -113,9 +128,13 @@ set(rviz_common_headers_to_moc
   include/rviz_common/interaction/selection_renderer.hpp
   src/rviz_common/splash_screen.hpp
   # src/rviz_common/time_panel.hpp
+  src/rviz_common/transformation/identity_frame_transformer.hpp
+  include/rviz_common/transformation/structs.hpp
   include/rviz_common/tool.hpp
   src/rviz_common/tool_manager.hpp
   src/rviz_common/tool_properties_panel.hpp
+  include/rviz_common/transformation/transformation_manager.hpp
+  src/rviz_common/transformation_panel.hpp
   include/rviz_common/view_controller.hpp
   include/rviz_common/view_manager.hpp
   src/rviz_common/views_panel.hpp
@@ -164,6 +183,8 @@ set(rviz_common_source_files
   src/rviz_common/properties/file_picker_property.cpp
   src/rviz_common/properties/float_edit.cpp
   src/rviz_common/properties/float_property.cpp
+  src/rviz_common/properties/grouped_checkbox_property.cpp
+  src/rviz_common/properties/grouped_checkbox_property_group.cpp
   src/rviz_common/properties/int_property.cpp
   src/rviz_common/properties/line_edit_with_button.cpp
   src/rviz_common/properties/parse_color.cpp
@@ -194,9 +215,14 @@ set(rviz_common_source_files
   src/rviz_common/interaction/view_picker.cpp
   src/rviz_common/splash_screen.cpp
   # src/rviz_common/time_panel.cpp
+  src/rviz_common/transformation/identity_frame_transformer.cpp
+  src/rviz_common/transformation/structs.cpp
+  src/rviz_common/transformation/ros_helpers/ros_conversion_helpers.cpp
   src/rviz_common/tool_manager.cpp
   src/rviz_common/tool_properties_panel.cpp
   src/rviz_common/tool.cpp
+  src/rviz_common/transformation_panel.cpp
+  src/rviz_common/transformation/transformation_manager.cpp
   src/rviz_common/uniform_string_stream.cpp
   src/rviz_common/view_controller.cpp
   src/rviz_common/view_manager.cpp
@@ -237,13 +263,13 @@ ament_target_dependencies(rviz_common
   rclcpp
   resource_retriever
   rviz_assimp_vendor
-  rviz_yaml_cpp_vendor
   sensor_msgs
   std_msgs
   tf2
   tf2_geometry_msgs
   tf2_ros
   urdf
+  yaml_cpp_vendor
 )
 # prevent pluginlib from using boost
 target_compile_definitions(rviz_common PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
@@ -257,14 +283,15 @@ ament_export_dependencies(
   geometry_msgs
   pluginlib
   rclcpp
-  rviz_yaml_cpp_vendor
   sensor_msgs
   std_msgs
   tf2
   tf2_geometry_msgs
   tf2_ros
+  yaml_cpp_vendor
 )
 ament_export_include_directories(include)
+ament_export_libraries(rviz_common)
 
 install(
   TARGETS rviz_common
@@ -314,8 +341,21 @@ if(BUILD_TESTING)
   ament_lint_cmake()
   ament_uncrustify()
 
+  ament_add_gmock(frame_manager_test
+    test/frame_manager_test.cpp
+    src/rviz_common/frame_manager.cpp
+  )
+  if(TARGET frame_manager_test)
+    target_link_libraries(frame_manager_test
+      rviz_common
+      rviz_ogre_vendor::OgreMain
+      rviz_ogre_vendor::OgreOverlay
+    )
+  endif()
+
   ament_add_gtest(rviz_common_config_test
-    test/config_test.cpp)
+    test/config_test.cpp
+  )
   if(TARGET rviz_common_config_test)
     target_link_libraries(rviz_common_config_test
       rviz_common
@@ -325,7 +365,8 @@ if(BUILD_TESTING)
   endif()
 
   ament_add_gtest(rviz_common_uniform_string_stream_test
-    test/uniform_string_stream_test.cpp)
+    test/uniform_string_stream_test.cpp
+  )
   if(TARGET rviz_common_uniform_string_stream_test)
     target_link_libraries(rviz_common_uniform_string_stream_test
       rviz_common
@@ -336,64 +377,73 @@ if(BUILD_TESTING)
 
   ament_add_gtest(rviz_common_property_test
     test/property_test.cpp
-    test/mock_property_change_receiver.cpp)
+    test/mock_property_change_receiver.cpp
+  )
   if(TARGET rviz_common_property_test)
     target_link_libraries(rviz_common_property_test rviz_common)
   endif()
 
-  ament_add_gmock(rviz_common_visualizer_app_test
-    test/visualizer_app_test.cpp)
+  ament_add_gmock(rviz_common_visualizer_app_test test/visualizer_app_test.cpp)
   if(TARGET rviz_common_visualizer_app_test)
     target_link_libraries(rviz_common_visualizer_app_test rviz_common)
   endif()
 
   ament_add_gmock(rviz_common_ros_node_abstraction_test
-    test/ros_node_abstraction_test.cpp)
+    test/ros_node_abstraction_test.cpp
+  )
   if(TARGET rviz_common_ros_node_abstraction_test)
     target_link_libraries(rviz_common_ros_node_abstraction_test rviz_common)
   endif()
 
-  if(DEFINED ENV{DISPLAY})
-    set(DISPLAYPRESENT TRUE)
+  ament_add_gmock(identity_transformer_test
+    test/transformation/identity_frame_transformer_test.cpp
+  )
+  if(TARGET identity_transformer_test)
+    target_link_libraries(identity_transformer_test rviz_common)
   endif()
 
-  if(APPLE OR DISPLAYPRESENT OR EnableDisplayTests STREQUAL "True")
-    message(STATUS "Enabling tests requiring a display")
+  ament_add_gmock(ros_conversion_helpers_test
+    test/transformation/ros_conversion_helpers_test.cpp
+  )
+  if(TARGET ros_conversion_helpers_test)
+    target_link_libraries(ros_conversion_helpers_test rviz_common)
+  endif()
 
-    ament_add_gmock(selection_manager_test
-      test/interaction/selection_manager_test.cpp
-      test/interaction/mock_selection_renderer.hpp
-      test/interaction/selection_test_fixture.hpp
-      test/display_context_fixture.cpp)
-    if(TARGET selection_manager_test)
-      target_link_libraries(selection_manager_test
-        rviz_common
-        rviz_ogre_vendor::OgreMain
-        rviz_ogre_vendor::OgreOverlay)
-    endif()
+  ament_add_gmock(selection_manager_test
+    test/interaction/selection_manager_test.cpp
+    test/interaction/mock_selection_renderer.hpp
+    test/interaction/selection_test_fixture.hpp
+    test/display_context_fixture.cpp
+    ${SKIP_DISPLAY_TESTS})
+  if(TARGET selection_manager_test)
+    target_link_libraries(selection_manager_test
+      rviz_common
+      rviz_ogre_vendor::OgreMain
+      rviz_ogre_vendor::OgreOverlay
+    )
+  endif()
 
-    ament_add_gmock(selection_handler_test
-      test/interaction/selection_handler_test.cpp
-      test/interaction/selection_test_fixture.hpp
-      test/display_context_fixture.cpp)
-    if(TARGET selection_handler_test)
-      target_link_libraries(selection_handler_test
-        rviz_common
-        rviz_ogre_vendor::OgreMain
-        rviz_ogre_vendor::OgreOverlay)
-    endif()
+  ament_add_gmock(selection_handler_test
+    test/interaction/selection_handler_test.cpp
+    test/interaction/selection_test_fixture.hpp
+    test/display_context_fixture.cpp
+    ${SKIP_DISPLAY_TESTS})
+  if(TARGET selection_handler_test)
+    target_link_libraries(selection_handler_test
+      rviz_common
+      rviz_ogre_vendor::OgreMain
+      rviz_ogre_vendor::OgreOverlay
+    )
+  endif()
 
-    ament_add_gtest(rviz_common_display_test
-      test/display_test.cpp
-      test/mock_display.cpp
-      test/mock_display_group.cpp)
-    if(TARGET rviz_common_display_test)
-      target_link_libraries(rviz_common_display_test
-        rviz_common
-        Qt5::Widgets)
-    ament_target_dependencies(rviz_common_display_test
-      rviz_yaml_cpp_vendor)
-    endif()
+  ament_add_gtest(rviz_common_display_test
+    test/display_test.cpp
+    test/mock_display.cpp
+    test/mock_display_group.cpp
+    ${SKIP_DISPLAY_TESTS})
+  if(TARGET rviz_common_display_test)
+    target_link_libraries(rviz_common_display_test rviz_common Qt5::Widgets)
+    ament_target_dependencies(rviz_common_display_test yaml_cpp_vendor)
   endif()
 endif()
 
