@@ -53,6 +53,7 @@ public:
     getSelectionManager, std::shared_ptr<rviz_common::interaction::SelectionManagerIface>());
   MOCK_CONST_METHOD0(getViewPicker, std::shared_ptr<rviz_common::interaction::ViewPickerIface>());
   MOCK_CONST_METHOD0(getFrameManager, rviz_common::FrameManagerIface * ());
+  MOCK_METHOD0(getTransformationManager, rviz_common::transformation::TransformationManager * ());
   MOCK_CONST_METHOD0(getFixedFrame, QString());
   MOCK_CONST_METHOD0(getFrameCount, uint64_t());
   MOCK_CONST_METHOD0(getDisplayFactory, rviz_common::DisplayFactory * ());
@@ -69,7 +70,7 @@ public:
   MOCK_CONST_METHOD0(getDefaultVisibilityBit, uint32_t());
   MOCK_METHOD0(visibilityBits, rviz_common::BitAllocator * ());
 
-  MOCK_METHOD1(setStatus, void(const QString &message));
+  MOCK_METHOD1(setStatus, void(const QString & message));
   MOCK_METHOD0(getClock, std::shared_ptr<rclcpp::Clock>());
 
   MOCK_METHOD0(queueRender, void());

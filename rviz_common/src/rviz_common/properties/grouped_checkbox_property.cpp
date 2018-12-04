@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,25 +27,45 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QApplication>
-#include <QMainWindow>
-#include <QTimer>
-#include <QWidget>
+#include <memory>
 
-#include "rviz_rendering/render_window.hpp"
+#include "rviz_common/properties/grouped_checkbox_property.hpp"
+#include "rviz_common/properties/grouped_checkbox_property_group.hpp"
 
-int main(int argc, char * argv[])
+namespace rviz_common
 {
-  QApplication a(argc, argv);
-  QMainWindow * window = new QMainWindow();
-  window->setWindowTitle(QString::fromUtf8("rendering_example"));
-  window->resize(250, 250);
+namespace properties
+{
 
-  rviz_rendering::RenderWindow render_window;
-  QWidget * containing_widget = QWidget::createWindowContainer(&render_window, window);
-
-  window->setCentralWidget(containing_widget);
-  window->show();
-
-  return a.exec();
+GroupedCheckboxProperty::GroupedCheckboxProperty(
+  std::shared_ptr<GroupedCheckboxPropertyGroup> group,
+  const QString & name,
+  bool default_value,
+  const QString & description,
+  Property * parent,
+  const char * changed_slot,
+  QObject * receiver
+)
+: BoolProperty(name, default_value, description, parent, changed_slot, receiver), group_(group)
+{
+  group->addProperty(this);
 }
+
+bool GroupedCheckboxProperty::setValue(const QVariant & new_value)
+{
+  Q_UNUSED(new_value);
+  return true;
+}
+
+bool GroupedCheckboxProperty::setRawValue(const QVariant & new_value)
+{
+  return Property::setValue(new_value);
+}
+
+void GroupedCheckboxProperty::checkPropertyInGroup()
+{
+  group_->setChecked(this);
+}
+
+}  // namespace properties
+}  // namespace rviz_common
