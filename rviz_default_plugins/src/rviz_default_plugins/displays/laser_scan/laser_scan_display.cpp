@@ -77,7 +77,6 @@ void LaserScanDisplay::processMessage(sensor_msgs::msg::LaserScan::ConstSharedPt
       *scan,
       *cloud,
       *buffer,
-      -1,
       laser_geometry::channel_option::Intensity);
   } catch (tf2::TransformException & e) {
     RVIZ_COMMON_LOG_DEBUG_STREAM(

@@ -2,9 +2,6 @@
 Changelog for package rviz_visual_testing_framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4.0.2 (2018-08-20)
-------------------
-
 4.0.1 (2018-06-28)
 ------------------
 * Add Qt dependency to testing packages. (`#330 <https://github.com/ros2/rviz/issues/330>`_)
