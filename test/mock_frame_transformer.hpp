@@ -1,6 +1,4 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -12,8 +10,8 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
+ *     * Neither the name of the copyright holder nor the names of its contributors
+ *       may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -29,55 +27,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_COMMON__FACTORY__FACTORY_HPP_
-#define RVIZ_COMMON__FACTORY__FACTORY_HPP_
+#ifndef MOCK_FRAME_TRANSFORMER_HPP_
+#define MOCK_FRAME_TRANSFORMER_HPP_
 
-#include <utility>
+#include <gmock/gmock.h>
+
+#include <memory>
+#include <string>
 #include <vector>
 
-#include <QIcon>  // NOLINT
-#include <QString>  // NOLINT
-#include <QStringList>  // NOLINT
+#include "rviz_common/transformation/frame_transformer.hpp"
+#include "rviz_common/ros_integration/ros_node_abstraction.hpp"
 
-namespace rviz_common
-{
-
-/// Struct to bundle the information available for a plugin
-struct PluginInfo
-{
-  QString id;
-  QString name;
-  QString package;
-  QString description;
-  QIcon icon;
-
-  friend bool operator==(const PluginInfo & lhs, const PluginInfo & rhs)
-  {
-    return lhs.id == rhs.id;
-  }
-
-  friend bool operator<(const PluginInfo & lhs, const PluginInfo & rhs)
-  {
-    return lhs.id < rhs.id;
-  }
-};
-
-/// Abstract base class representing a plugin load-able class factory.
-/**
- * The class represents the ability to get a list of class IDs and the ability
- * to get name, description, and package strings for each.
- * Actually instantiating objects must be done by subclasses specialized for
- * specific types.
- */
-class Factory
+class MockFrameTransformer : public rviz_common::transformation::FrameTransformer
 {
 public:
-  virtual ~Factory() {}
-
-  virtual std::vector<PluginInfo> getDeclaredPlugins() = 0;
-  virtual PluginInfo getPluginInfo(const QString & class_id) const = 0;
+  MOCK_METHOD2(initialize, void(
+      rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
+      rclcpp::Clock::SharedPtr clock));
+  MOCK_METHOD0(clear, void());
+  MOCK_METHOD0(getAllFrameNames, std::vector<std::string>());
+  MOCK_METHOD2(transform, rviz_common::transformation::PoseStamped(
+      const rviz_common::transformation::PoseStamped & pose_in, const std::string & frame));
+  MOCK_METHOD2(transformIsAvailable, bool(
+      const std::string & target_frame, const std::string & source_frame));
+  MOCK_METHOD4(transformHasProblems, bool(
+      const std::string & frame,
+      const std::string & fixed_frame,
+      const rclcpp::Time & time,
+      std::string & error));
+  MOCK_METHOD2(frameHasProblems, bool(const std::string & frame, std::string & error));
+  MOCK_METHOD0(getConnector,
+    rviz_common::transformation::TransformationLibraryConnector::WeakPtr());
 };
 
-}  // namespace rviz_common
-
-#endif  // RVIZ_COMMON__FACTORY__FACTORY_HPP_
+#endif  // MOCK_FRAME_TRANSFORMER_HPP_

@@ -1,6 +1,4 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
- * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -29,55 +27,45 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_COMMON__FACTORY__FACTORY_HPP_
-#define RVIZ_COMMON__FACTORY__FACTORY_HPP_
+#include <memory>
 
-#include <utility>
-#include <vector>
-
-#include <QIcon>  // NOLINT
-#include <QString>  // NOLINT
-#include <QStringList>  // NOLINT
+#include "rviz_common/properties/grouped_checkbox_property.hpp"
+#include "rviz_common/properties/grouped_checkbox_property_group.hpp"
 
 namespace rviz_common
 {
-
-/// Struct to bundle the information available for a plugin
-struct PluginInfo
+namespace properties
 {
-  QString id;
-  QString name;
-  QString package;
-  QString description;
-  QIcon icon;
 
-  friend bool operator==(const PluginInfo & lhs, const PluginInfo & rhs)
-  {
-    return lhs.id == rhs.id;
-  }
-
-  friend bool operator<(const PluginInfo & lhs, const PluginInfo & rhs)
-  {
-    return lhs.id < rhs.id;
-  }
-};
-
-/// Abstract base class representing a plugin load-able class factory.
-/**
- * The class represents the ability to get a list of class IDs and the ability
- * to get name, description, and package strings for each.
- * Actually instantiating objects must be done by subclasses specialized for
- * specific types.
- */
-class Factory
+GroupedCheckboxProperty::GroupedCheckboxProperty(
+  std::shared_ptr<GroupedCheckboxPropertyGroup> group,
+  const QString & name,
+  bool default_value,
+  const QString & description,
+  Property * parent,
+  const char * changed_slot,
+  QObject * receiver
+)
+: BoolProperty(name, default_value, description, parent, changed_slot, receiver), group_(group)
 {
-public:
-  virtual ~Factory() {}
+  group->addProperty(this);
+}
 
-  virtual std::vector<PluginInfo> getDeclaredPlugins() = 0;
-  virtual PluginInfo getPluginInfo(const QString & class_id) const = 0;
-};
+bool GroupedCheckboxProperty::setValue(const QVariant & new_value)
+{
+  Q_UNUSED(new_value);
+  return true;
+}
 
+bool GroupedCheckboxProperty::setRawValue(const QVariant & new_value)
+{
+  return Property::setValue(new_value);
+}
+
+void GroupedCheckboxProperty::checkPropertyInGroup()
+{
+  group_->setChecked(this);
+}
+
+}  // namespace properties
 }  // namespace rviz_common
-
-#endif  // RVIZ_COMMON__FACTORY__FACTORY_HPP_
