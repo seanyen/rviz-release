@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -11,8 +10,8 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
+ *     * Neither the name of the copyright holder nor the names of its contributors
+ *       may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -28,54 +27,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__PUBLISHERS__RANGE_PUBLISHER_HPP_
+#define RVIZ_DEFAULT_PLUGINS__PUBLISHERS__RANGE_PUBLISHER_HPP_
 
-#include <QObject>
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <vector>
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "rclcpp/node.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/clock.hpp"
+#include "std_msgs/msg/header.hpp"
+#include "sensor_msgs/msg/range.hpp"
 
-#include "rviz_default_plugins/tools/pose/pose_tool.hpp"
-#include "rviz_default_plugins/visibility_control.hpp"
+using namespace std::chrono_literals;  // NOLINT
 
-namespace rviz_common
+namespace nodes
 {
-class DisplayContext;
-namespace properties
-{
-class StringProperty;
-}  // namespace properties
-}  // namespace rviz_common
 
-namespace rviz_default_plugins
+class RangePublisher : public rclcpp::Node
 {
-namespace tools
-{
-class RVIZ_DEFAULT_PLUGINS_PUBLIC GoalTool : public PoseTool
-{
-  Q_OBJECT
-
 public:
-  GoalTool();
-
-  ~GoalTool() override;
-
-  void onInitialize() override;
-
-protected:
-  void onPoseSet(double x, double y, double theta) override;
-
-private Q_SLOTS:
-  void updateTopic();
+  RangePublisher()
+  : Node("range_publisher")
+  {
+    publisher = this->create_publisher<sensor_msgs::msg::Range>("range");
+    timer = this->create_wall_timer(500ms, std::bind(&RangePublisher::timer_callback, this));
+  }
 
 private:
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher_;
+  void timer_callback()
+  {
+    auto message = sensor_msgs::msg::Range();
+    message.header = std_msgs::msg::Header();
+    message.header.frame_id = "range_frame";
+    message.header.stamp = rclcpp::Clock().now();
 
-  rviz_common::properties::StringProperty * topic_property_;
+    message.radiation_type = sensor_msgs::msg::Range::INFRARED;
+    message.range = 3;
+    message.min_range = 0;
+    message.max_range = 6;
+    message.field_of_view = static_cast<float>(M_PI / 2);
+
+    publisher->publish(message);
+  }
+
+  rclcpp::TimerBase::SharedPtr timer;
+  rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr publisher;
 };
 
-}  // namespace tools
-}  // namespace rviz_default_plugins
+}  // namespace nodes
 
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__PUBLISHERS__RANGE_PUBLISHER_HPP_

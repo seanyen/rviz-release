@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -11,7 +10,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
+ *     * Neither the name of the copyright holders nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
  *
@@ -28,54 +27,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
+#include <memory>
 
-#include <QObject>
+#include "rviz_visual_testing_framework/visual_test_fixture.hpp"
+#include "rviz_visual_testing_framework/visual_test_publisher.hpp"
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "rclcpp/node.hpp"
+#include "../../page_objects/range_display_page_object.hpp"
+#include "../../publishers/range_publisher.hpp"
 
-#include "rviz_default_plugins/tools/pose/pose_tool.hpp"
-#include "rviz_default_plugins/visibility_control.hpp"
+TEST_F(VisualTestFixture, range_display_visual_test) {
+  auto range_publisher = std::make_unique<VisualTestPublisher>(
+    std::make_shared<nodes::RangePublisher>(), "range_frame");
 
-namespace rviz_common
-{
-class DisplayContext;
-namespace properties
-{
-class StringProperty;
-}  // namespace properties
-}  // namespace rviz_common
+  setCamPose(Ogre::Vector3(10, 0, 0));
+  setCamLookAt(Ogre::Vector3(0, 0, 0));
 
-namespace rviz_default_plugins
-{
-namespace tools
-{
-class RVIZ_DEFAULT_PLUGINS_PUBLIC GoalTool : public PoseTool
-{
-  Q_OBJECT
+  auto range_display = addDisplay<RangeDisplayPageObject>();
+  range_display->setTopic("/range");
+  range_display->setColor(30, 255, 255);
+  range_display->setAlpha(1.0f);
+  captureMainWindow();
 
-public:
-  GoalTool();
+  range_display->setAlpha(0.0f);
+  captureMainWindow("empty_scene");
 
-  ~GoalTool() override;
-
-  void onInitialize() override;
-
-protected:
-  void onPoseSet(double x, double y, double theta) override;
-
-private Q_SLOTS:
-  void updateTopic();
-
-private:
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher_;
-
-  rviz_common::properties::StringProperty * topic_property_;
-};
-
-}  // namespace tools
-}  // namespace rviz_default_plugins
-
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
+  assertScreenShotsIdentity();
+}

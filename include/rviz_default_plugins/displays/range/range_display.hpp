@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
- * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,83 +27,80 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID_CELLS__GRID_CELLS_DISPLAY_HPP_
-#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID_CELLS__GRID_CELLS_DISPLAY_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__RANGE__RANGE_DISPLAY_HPP_
+#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__RANGE__RANGE_DISPLAY_HPP_
 
 #include <memory>
+#include <vector>
 
-#include "nav_msgs/msg/grid_cells.hpp"
-#include "nav_msgs/msg/map_meta_data.hpp"
+#include "sensor_msgs/msg/range.hpp"
 
-#include "rviz_common/display.hpp"
 #include "rviz_common/ros_topic_display.hpp"
-#include "rviz_common/display_context.hpp"
-
 #include "rviz_default_plugins/visibility_control.hpp"
 
 namespace rviz_rendering
 {
-class PointCloud;
-}
+class Shape;
+}  // namespace rviz_rendering
 
 namespace rviz_common
 {
+class QueueSizeProperty;
 namespace properties
 {
 class ColorProperty;
 class FloatProperty;
-}  // properties
-}  // rviz_common
+class IntProperty;
+}  // namespace properties
+}  // namespace rviz_common
+
 
 namespace rviz_default_plugins
 {
 namespace displays
 {
-
-// TODO(Martin-Idel-SI): This display previously used tf message filter. Use again once available.
 /**
- * \class GridCellsDisplay
- * \brief Displays a nav_msgs::GridCells message
+ * \class RangeDisplay
+ * \brief Displays a sensor_msgs::Range message as a cone.
  */
-class RVIZ_DEFAULT_PLUGINS_PUBLIC GridCellsDisplay : public
-  rviz_common::RosTopicDisplay<nav_msgs::msg::GridCells>
+class RVIZ_DEFAULT_PLUGINS_PUBLIC RangeDisplay : public
+  rviz_common::RosTopicDisplay<sensor_msgs::msg::Range>
 {
   Q_OBJECT
 
 public:
-  // TODO(Martin-Idel-SI): Constructor for testing. Remove once ros nodes can be mocked and
+  // TODO(botteroa-si): Constructor for testing. Remove once ros nodes can be mocked and
   // initialize() can be called
-  explicit GridCellsDisplay(rviz_common::DisplayContext * display_context);
+  explicit RangeDisplay(rviz_common::DisplayContext * display_context);
 
-  GridCellsDisplay();
+  RangeDisplay();
 
-  ~GridCellsDisplay() override;
+  ~RangeDisplay() override;
 
+  void reset() override;
+
+  void processMessage(sensor_msgs::msg::Range::ConstSharedPtr msg) override;
+
+protected:
   void onInitialize() override;
 
-  void processMessage(nav_msgs::msg::GridCells::ConstSharedPtr msg) override;
-
-  void setupCloud();
-
 private Q_SLOTS:
-  void updateAlpha();
-  void updateColor();
+  void updateBufferLength();
+  void updateColorAndAlpha();
 
 private:
-  bool messageIsValid(nav_msgs::msg::GridCells::ConstSharedPtr msg);
-  void convertMessageToCloud(nav_msgs::msg::GridCells::ConstSharedPtr msg);
-  bool setTransform(std_msgs::msg::Header const & header);
+  float getDisplayedRange(sensor_msgs::msg::Range::ConstSharedPtr msg);
+  geometry_msgs::msg::Pose getPose(float displayed_range);
 
-  std::shared_ptr<rviz_rendering::PointCloud> cloud_;
+  std::vector<std::shared_ptr<rviz_rendering::Shape>> cones_;
 
   rviz_common::properties::ColorProperty * color_property_;
   rviz_common::properties::FloatProperty * alpha_property_;
-
-  uint64_t last_frame_count_;
+  rviz_common::properties::IntProperty * buffer_length_property_;
+  std::unique_ptr<rviz_common::QueueSizeProperty> queue_size_property_;
 };
 
 }  // namespace displays
 }  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID_CELLS__GRID_CELLS_DISPLAY_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__RANGE__RANGE_DISPLAY_HPP_

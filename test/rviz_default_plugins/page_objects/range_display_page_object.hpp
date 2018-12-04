@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -11,8 +10,8 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
+ *     * Neither the name of the copyright holder nor the names of its contributors
+ *       may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -28,54 +27,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__PAGE_OBJECTS__RANGE_DISPLAY_PAGE_OBJECT_HPP_
+#define RVIZ_DEFAULT_PLUGINS__PAGE_OBJECTS__RANGE_DISPLAY_PAGE_OBJECT_HPP_
 
-#include <QObject>
+#include "rviz_visual_testing_framework/page_objects/base_page_object.hpp"
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "rclcpp/node.hpp"
-
-#include "rviz_default_plugins/tools/pose/pose_tool.hpp"
-#include "rviz_default_plugins/visibility_control.hpp"
-
-namespace rviz_common
+class RangeDisplayPageObject : public BasePageObject
 {
-class DisplayContext;
-namespace properties
-{
-class StringProperty;
-}  // namespace properties
-}  // namespace rviz_common
-
-namespace rviz_default_plugins
-{
-namespace tools
-{
-class RVIZ_DEFAULT_PLUGINS_PUBLIC GoalTool : public PoseTool
-{
-  Q_OBJECT
-
 public:
-  GoalTool();
+  RangeDisplayPageObject();
 
-  ~GoalTool() override;
-
-  void onInitialize() override;
-
-protected:
-  void onPoseSet(double x, double y, double theta) override;
-
-private Q_SLOTS:
-  void updateTopic();
-
-private:
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher_;
-
-  rviz_common::properties::StringProperty * topic_property_;
+  void setTopic(QString topic);
+  void setUnreliable(bool unreliable);
+  void setQueueSize(int queue_size);
+  void setColor(int red, int green, int blue);
+  void setAlpha(float alpha);
+  void setBufferLength(int buffer_length);
 };
 
-}  // namespace tools
-}  // namespace rviz_default_plugins
-
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__PAGE_OBJECTS__RANGE_DISPLAY_PAGE_OBJECT_HPP_

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
+ * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -28,83 +28,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__POSE_ESTIMATE__INITIAL_POSE_TOOL_HPP_
+#define RVIZ_DEFAULT_PLUGINS__TOOLS__POSE_ESTIMATE__INITIAL_POSE_TOOL_HPP_
 
-#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID_CELLS__GRID_CELLS_DISPLAY_HPP_
-#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID_CELLS__GRID_CELLS_DISPLAY_HPP_
+#include <QObject>
 
-#include <memory>
+#include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
+#include "rclcpp/node.hpp"
 
-#include "nav_msgs/msg/grid_cells.hpp"
-#include "nav_msgs/msg/map_meta_data.hpp"
-
-#include "rviz_common/display.hpp"
-#include "rviz_common/ros_topic_display.hpp"
-#include "rviz_common/display_context.hpp"
-
+#include "rviz_default_plugins/tools/pose/pose_tool.hpp"
 #include "rviz_default_plugins/visibility_control.hpp"
-
-namespace rviz_rendering
-{
-class PointCloud;
-}
 
 namespace rviz_common
 {
+class DisplayContext;
 namespace properties
 {
-class ColorProperty;
-class FloatProperty;
-}  // properties
-}  // rviz_common
+class StringProperty;
+}  // namespace properties
+}  // namespace rviz_common
 
 namespace rviz_default_plugins
 {
-namespace displays
+namespace tools
 {
-
-// TODO(Martin-Idel-SI): This display previously used tf message filter. Use again once available.
-/**
- * \class GridCellsDisplay
- * \brief Displays a nav_msgs::GridCells message
- */
-class RVIZ_DEFAULT_PLUGINS_PUBLIC GridCellsDisplay : public
-  rviz_common::RosTopicDisplay<nav_msgs::msg::GridCells>
+class RVIZ_DEFAULT_PLUGINS_PUBLIC InitialPoseTool : public PoseTool
 {
   Q_OBJECT
 
 public:
-  // TODO(Martin-Idel-SI): Constructor for testing. Remove once ros nodes can be mocked and
-  // initialize() can be called
-  explicit GridCellsDisplay(rviz_common::DisplayContext * display_context);
+  InitialPoseTool();
 
-  GridCellsDisplay();
-
-  ~GridCellsDisplay() override;
+  ~InitialPoseTool() override;
 
   void onInitialize() override;
 
-  void processMessage(nav_msgs::msg::GridCells::ConstSharedPtr msg) override;
-
-  void setupCloud();
+protected:
+  void onPoseSet(double x, double y, double theta) override;
 
 private Q_SLOTS:
-  void updateAlpha();
-  void updateColor();
+  void updateTopic();
 
 private:
-  bool messageIsValid(nav_msgs::msg::GridCells::ConstSharedPtr msg);
-  void convertMessageToCloud(nav_msgs::msg::GridCells::ConstSharedPtr msg);
-  bool setTransform(std_msgs::msg::Header const & header);
+  rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr publisher_;
 
-  std::shared_ptr<rviz_rendering::PointCloud> cloud_;
-
-  rviz_common::properties::ColorProperty * color_property_;
-  rviz_common::properties::FloatProperty * alpha_property_;
-
-  uint64_t last_frame_count_;
+  rviz_common::properties::StringProperty * topic_property_;
 };
 
-}  // namespace displays
+}  // namespace tools
 }  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__GRID_CELLS__GRID_CELLS_DISPLAY_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__POSE_ESTIMATE__INITIAL_POSE_TOOL_HPP_

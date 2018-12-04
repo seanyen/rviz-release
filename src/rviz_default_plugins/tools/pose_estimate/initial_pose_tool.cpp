@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
+ * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -28,68 +28,71 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "rviz_default_plugins/tools/nav_goal/goal_tool.hpp"
+#define _USE_MATH_DEFINES
+#include "rviz_default_plugins/tools/pose_estimate/initial_pose_tool.hpp"
 
 #include <string>
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
-
 #include "rviz_common/display_context.hpp"
-#include "rviz_common/logging.hpp"
 #include "rviz_common/properties/string_property.hpp"
+#include "rviz_common/logging.hpp"
 
 namespace rviz_default_plugins
 {
 namespace tools
 {
 
-GoalTool::GoalTool()
-: rviz_default_plugins::tools::PoseTool()
+InitialPoseTool::InitialPoseTool()
 {
-  shortcut_key_ = 'g';
+  shortcut_key_ = 'p';
 
-  topic_property_ = new rviz_common::properties::StringProperty("Topic", "goal",
-      "The topic on which to publish navigation goals.",
+  topic_property_ = new rviz_common::properties::StringProperty("Topic", "initialpose",
+      "The topic on which to publish initial pose estimates.",
       getPropertyContainer(), SLOT(updateTopic()), this);
 }
 
-GoalTool::~GoalTool() = default;
+InitialPoseTool::~InitialPoseTool() = default;
 
-void GoalTool::onInitialize()
+void InitialPoseTool::onInitialize()
 {
   PoseTool::onInitialize();
-  setName("2D Nav Goal");
+  setName("2D Pose Estimate");
   updateTopic();
 }
 
-void GoalTool::updateTopic()
+void InitialPoseTool::updateTopic()
 {
   // TODO(anhosi, wjwwood): replace with abstraction for publishers once available
   publisher_ = context_->getRosNodeAbstraction().lock()->get_raw_node()->
-    template create_publisher<geometry_msgs::msg::PoseStamped>(topic_property_->getStdString());
+    template create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
+    topic_property_->getStdString());
 }
 
-void GoalTool::onPoseSet(double x, double y, double theta)
+void InitialPoseTool::onPoseSet(double x, double y, double theta)
 {
   std::string fixed_frame = context_->getFixedFrame().toStdString();
 
-  geometry_msgs::msg::PoseStamped goal;
-  goal.header.stamp = rclcpp::Clock().now();
-  goal.header.frame_id = fixed_frame;
+  geometry_msgs::msg::PoseWithCovarianceStamped pose;
+  pose.header.frame_id = fixed_frame;
+  pose.header.stamp = rclcpp::Clock().now();
 
-  goal.pose.position.x = x;
-  goal.pose.position.y = y;
-  goal.pose.position.z = 0.0;
+  pose.pose.pose.position.x = x;
+  pose.pose.pose.position.y = y;
+  pose.pose.pose.position.z = 0.0;
 
-  goal.pose.orientation = orientationAroundZAxis(theta);
+  pose.pose.pose.orientation = orientationAroundZAxis(theta);
 
-  logPose(goal.pose.position, goal.pose.orientation, theta, fixed_frame);
+  pose.pose.covariance[6 * 0 + 0] = 0.5 * 0.5;
+  pose.pose.covariance[6 * 1 + 1] = 0.5 * 0.5;
+  pose.pose.covariance[6 * 5 + 5] = M_PI / 12.0 * M_PI / 12.0;
 
-  publisher_->publish(goal);
+  logPose(pose.pose.pose.position, pose.pose.pose.orientation, theta, fixed_frame);
+
+  publisher_->publish(pose);
 }
 
 }  // namespace tools
 }  // namespace rviz_default_plugins
 
 #include <pluginlib/class_list_macros.hpp>  // NOLINT
-PLUGINLIB_EXPORT_CLASS(rviz_default_plugins::tools::GoalTool, rviz_common::Tool)
+PLUGINLIB_EXPORT_CLASS(rviz_default_plugins::tools::InitialPoseTool, rviz_common::Tool)

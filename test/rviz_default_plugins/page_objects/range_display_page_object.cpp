@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
  * Copyright (c) 2018, Bosch Software Innovations GmbH.
  * All rights reserved.
  *
@@ -11,8 +10,8 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
+ *     * Neither the name of the copyright holder nor the names of its contributors
+ *       may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -28,54 +27,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
-#define RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
+#include "range_display_page_object.hpp"
 
-#include <QObject>
+RangeDisplayPageObject::RangeDisplayPageObject()
+: BasePageObject(0, "Range")
+{}
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "rclcpp/node.hpp"
-
-#include "rviz_default_plugins/tools/pose/pose_tool.hpp"
-#include "rviz_default_plugins/visibility_control.hpp"
-
-namespace rviz_common
+void RangeDisplayPageObject::setTopic(QString topic)
 {
-class DisplayContext;
-namespace properties
+  setComboBox("Topic", topic);
+  waitForFirstMessage();
+}
+
+void RangeDisplayPageObject::setUnreliable(bool unreliable)
 {
-class StringProperty;
-}  // namespace properties
-}  // namespace rviz_common
+  setBool("Unreliable", unreliable);
+}
 
-namespace rviz_default_plugins
+void RangeDisplayPageObject::setQueueSize(int queue_size)
 {
-namespace tools
+  setInt("Queue Size", queue_size);
+}
+
+void RangeDisplayPageObject::setColor(int red, int green, int blue)
 {
-class RVIZ_DEFAULT_PLUGINS_PUBLIC GoalTool : public PoseTool
+  setColorCode("Color", red, green, blue);
+}
+
+void RangeDisplayPageObject::setAlpha(float alpha)
 {
-  Q_OBJECT
+  setFloat("Alpha", alpha);
+}
 
-public:
-  GoalTool();
-
-  ~GoalTool() override;
-
-  void onInitialize() override;
-
-protected:
-  void onPoseSet(double x, double y, double theta) override;
-
-private Q_SLOTS:
-  void updateTopic();
-
-private:
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher_;
-
-  rviz_common::properties::StringProperty * topic_property_;
-};
-
-}  // namespace tools
-}  // namespace rviz_default_plugins
-
-#endif  // RVIZ_DEFAULT_PLUGINS__TOOLS__NAV_GOAL__GOAL_TOOL_HPP_
+void RangeDisplayPageObject::setBufferLength(int buffer_length)
+{
+  setInt("Buffer Length", buffer_length);
+}

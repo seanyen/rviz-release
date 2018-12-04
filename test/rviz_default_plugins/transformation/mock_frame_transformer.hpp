@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__MOCK_SELECTION_MANAGER_HPP_
-#define RVIZ_DEFAULT_PLUGINS__MOCK_SELECTION_MANAGER_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__TRANSFORMATION__MOCK_FRAME_TRANSFORMER_HPP_
+#define RVIZ_DEFAULT_PLUGINS__TRANSFORMATION__MOCK_FRAME_TRANSFORMER_HPP_
 
 #include <gmock/gmock.h>
 
@@ -38,31 +38,25 @@
 #include <string>
 #include <vector>
 
-#include "rviz_common/interaction/forwards.hpp"
-#include "rviz_common/interaction/selection_manager_iface.hpp"
+#include "rviz_common/transformation/frame_transformer.hpp"
 
-using rviz_common::interaction::CollObjectHandle;
-using rviz_common::interaction::M_Picked;
-using rviz_common::interaction::SelectionHandler;
-
-class MockSelectionManager : public rviz_common::interaction::SelectionManagerIface
+class MockFrameTransformer : public rviz_common::transformation::FrameTransformer
 {
 public:
-  MOCK_METHOD0(initialize, void());
-  MOCK_METHOD1(setDebugMode, void(bool));
-
-  MOCK_METHOD5(highlight, void(rviz_rendering::RenderWindow *, int, int, int, int));
-  MOCK_METHOD0(removeHighlight, void());
-  MOCK_METHOD6(select, void(rviz_rendering::RenderWindow *, int, int, int, int, SelectType));
-
-  MOCK_METHOD0(update, void());
-  MOCK_CONST_METHOD0(getSelection, const M_Picked & ());
-
-  MOCK_METHOD0(focusOnSelection, void());
-  MOCK_METHOD1(setTextureSize, void(unsigned int));
-
-  MOCK_METHOD4(get3DPoint, bool(Ogre::Viewport *, int, int, Ogre::Vector3 &));
-  MOCK_METHOD0(getPropertyModel, rviz_common::properties::PropertyTreeModel *());
+  MOCK_METHOD2(initialize, void(
+      rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr, rclcpp::Clock::SharedPtr));
+  MOCK_METHOD0(clear, void());
+  MOCK_METHOD0(getAllFrameNames, std::vector<std::string>());
+  MOCK_METHOD2(
+    transform, rviz_common::transformation::PoseStamped(
+      const rviz_common::transformation::PoseStamped &, const std::string &));
+  MOCK_METHOD2(transformIsAvailable, bool(const std::string &, const std::string &));
+  MOCK_METHOD4(
+    transformHasProblems,
+    bool(const std::string &, const std::string &, const rclcpp::Time &, std::string &));
+  MOCK_METHOD2(frameHasProblems, bool(const std::string &, std::string &));
+  MOCK_METHOD0(getConnector,
+    rviz_common::transformation::TransformationLibraryConnector::WeakPtr());
 };
 
-#endif  // RVIZ_DEFAULT_PLUGINS__MOCK_SELECTION_MANAGER_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__TRANSFORMATION__MOCK_FRAME_TRANSFORMER_HPP_
