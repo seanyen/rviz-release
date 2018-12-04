@@ -1,3 +1,38 @@
+## rviz (crystal) - 4.0.1-0
+
+The packages in the `rviz` repository were released into the `crystal` distro by running `/Users/william/.pyenv/versions/2.7.15/bin/bloom-release -r crystal -t crystal rviz` on `Tue, 04 Dec 2018 23:25:52 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+- `rviz_yaml_cpp_vendor`
+
+These packages were explicitly ignored:
+- `rviz`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `4.0.1-0`
+
+Versions of tools used:
+
+- bloom version: `0.6.9`
+- catkin_pkg version: `0.4.9`
+- rosdep version: `0.13.0`
+- rosdistro version: `0.7.0`
+- vcstools version: `0.1.40`
+
+
 ## rviz (bouncy) - 4.0.2-0
 
 The packages in the `rviz` repository were released into the `bouncy` distro by running `/Users/william/.pyenv/versions/2.7.15/bin/bloom-release -r bouncy -t bouncy rviz -e` on `Mon, 20 Aug 2018 20:14:08 -0000`
