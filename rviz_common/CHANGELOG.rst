@@ -2,6 +2,11 @@
 Changelog for package rviz_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.0 (2019-01-14)
+------------------
+* Fix errors from uncrustify v0.68 (`#366 <https://github.com/ros2/rviz/issues/366>`_)
+* Contributors: Jacob Perron, William Woodall
+
 5.0.0 (2018-12-04)
 ------------------
 * Moved rviz_yaml_cpp_vendor into it's own repo (`#361 <https://github.com/ros2/rviz/issues/361>`_)
@@ -9,8 +14,8 @@ Changelog for package rviz_common
 * Added virtual destructors for WindowManagerInterface and ViewportProjectionFinder (`#356 <https://github.com/ros2/rviz/issues/356>`_)
 * Changed to use spin_some with max_duration (`#354 <https://github.com/ros2/rviz/issues/354>`_)
   * spin_once() limits the number of callbacks that can be called based on how quickly the gui updates.
-    This results in lag when displaying tf frames.
-    Use spin_some(max_duration) to execute all of the work available.
+  * This results in lag when displaying tf frames.
+  * Use spin_some(max_duration) to execute all of the work available.
 * Made the transformation framework used by rviz pluggable. (`#346 <https://github.com/ros2/rviz/issues/346>`_)
 * Fixed wrong name of InitialPose plugin in default config (`#352 <https://github.com/ros2/rviz/issues/352>`_)
 * Added hotkeys (also to help) (`#312 <https://github.com/ros2/rviz/issues/312>`_)
