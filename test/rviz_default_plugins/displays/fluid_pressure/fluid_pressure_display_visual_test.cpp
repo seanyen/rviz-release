@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017, Bosch Software Innovations GmbH.
+ * Copyright (c) 2018, TNG Technology Consulting GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,31 +35,39 @@
 #include "rviz_visual_testing_framework/visual_test_publisher.hpp"
 
 #include "../../page_objects/point_cloud_common_page_object.hpp"
-#include "../../publishers/laser_scan_publisher.hpp"
+#include "../../publishers/fluid_pressure_publisher.hpp"
 
-class LaserScanDisplayPageObject
+class FluidPressureDisplayPageObject
   : public PointCloudCommonPageObject
 {
 public:
-  LaserScanDisplayPageObject()
-  : PointCloudCommonPageObject("LaserScan")
+  FluidPressureDisplayPageObject()
+  : PointCloudCommonPageObject("FluidPressure")
   {}
 };
 
-TEST_F(VisualTestFixture, laser_scan_display) {
-  auto laser_scan_publisher =
+TEST_F(VisualTestFixture, sphere_changes_color_depending_on_fluid_pressure) {
+  auto fluid_pressure_publisher = std::make_shared<nodes::FluidPressurePublisher>();
+  auto fluid_pressure_visual_publisher =
     std::make_unique<VisualTestPublisher>(
-    std::make_shared<nodes::LaserScanPublisher>(), "laser_scan_frame");
+    fluid_pressure_publisher, "fluid_pressure_frame");
 
-  // Set the position of the camera and its sight vector:
-  setCamPose(Ogre::Vector3(15, 15, 15));
+  setCamPose(Ogre::Vector3(0, 0, 16));
   setCamLookAt(Ogre::Vector3(0, 0, 0));
 
-  auto laser_scan_display = addDisplay<LaserScanDisplayPageObject>();
-  laser_scan_display->setTopic("/laser_scan");
-  laser_scan_display->setStyle("Spheres");
-  laser_scan_display->setSizeMeters(10);
-  laser_scan_display->setColor(255, 0, 0);
+  auto fluid_pressure_display = addDisplay<FluidPressureDisplayPageObject>();
+  fluid_pressure_display->setTopic("/fluid_pressure");
+  fluid_pressure_display->setStyle("Spheres");
+  fluid_pressure_display->setSizeMeters(11);
 
-  assertMainWindowIdentity();
+  fluid_pressure_publisher->setFluidPressure(99000);
+  captureMainWindow("fluid_pressure_display_low_fluid_pressure");
+
+  executor_->queueAction([fluid_pressure_publisher]()
+    {
+      fluid_pressure_publisher->setFluidPressure(104000);
+    });
+
+  captureMainWindow("fluid_pressure_display_high_fluid_pressure");
+  assertScreenShotsIdentity();
 }

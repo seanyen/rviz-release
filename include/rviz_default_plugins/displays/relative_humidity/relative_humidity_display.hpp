@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2009, Willow Garage, Inc.
- * Copyright (c) 2018, Bosch Software Innovations GmbH.
+ * Copyright (c) 2008, Willow Garage, Inc.
+ * Copyright (c) 2018, TNG Technology Consulting GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,52 +28,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__MARKER__MARKERS__POINTS_MARKER_HPP_
-#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__MARKER__MARKERS__POINTS_MARKER_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__RELATIVE_HUMIDITY__RELATIVE_HUMIDITY_DISPLAY_HPP_
+#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__RELATIVE_HUMIDITY__RELATIVE_HUMIDITY_DISPLAY_HPP_
 
-#include "rviz_rendering/objects/point_cloud.hpp"
-
-#include "rviz_default_plugins/displays/marker/markers/marker_base.hpp"
-#include "rviz_default_plugins/visibility_control.hpp"
-
-namespace Ogre
-{
-class SceneNode;
-}  // namespace Ogre
+#include "rviz_default_plugins/displays/pointcloud/point_cloud_scalar_display.hpp"
+#include "sensor_msgs/msg/relative_humidity.hpp"
 
 namespace rviz_default_plugins
 {
+
+class PointCloudCommon;
+
 namespace displays
 {
-namespace markers
-{
 
-class RVIZ_DEFAULT_PLUGINS_PUBLIC PointsMarker : public MarkerBase
+/// Display a RelativeHumidity message of type sensor_msgs::RelativeHumidity
+/**
+ * \class RelativeHumidityDisplay
+ */
+
+class RVIZ_DEFAULT_PLUGINS_PUBLIC RelativeHumidityDisplay
+  : public PointCloudScalarDisplay<sensor_msgs::msg::RelativeHumidity>
 {
+  Q_OBJECT
+
 public:
-  PointsMarker(
-    MarkerCommon * owner, rviz_common::DisplayContext * context, Ogre::SceneNode * parent_node);
+  RelativeHumidityDisplay();
+  ~RelativeHumidityDisplay() override;
 
-  ~PointsMarker() override;
+private:
+  void processMessage(const sensor_msgs::msg::RelativeHumidity::ConstSharedPtr message) override;
 
-  void setHighlightColor(float red, float green, float blue);
-
-protected:
-  void onNewMessage(
-    const MarkerConstSharedPtr & old_message, const MarkerConstSharedPtr & new_message) override;
-  void transformAndSetVisibility(
-    const MarkerConstSharedPtr & new_message,
-    Ogre::Vector3 & position,
-    Ogre::Vector3 & scale,
-    Ogre::Quaternion & orientation);
-  void setRenderModeAndDimensions(const MarkerConstSharedPtr & new_message, Ogre::Vector3 & scale);
-  void addPointsFromMessage(const MarkerConstSharedPtr & new_message);
-
-  rviz_rendering::PointCloud * points_;
+  void setInitialValues() override;
+  void hideUnneededProperties() override;
 };
 
-}  // namespace markers
 }  // namespace displays
 }  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__MARKER__MARKERS__POINTS_MARKER_HPP_
+#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__RELATIVE_HUMIDITY__RELATIVE_HUMIDITY_DISPLAY_HPP_

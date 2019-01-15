@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2009, Willow Garage, Inc.
- * Copyright (c) 2018, Bosch Software Innovations GmbH.
+ * Copyright (c) 2012, Willow Garage, Inc.
+ * Copyright (c) 2018, TNG Technology Consulting GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,52 +28,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__MARKER__MARKERS__POINTS_MARKER_HPP_
-#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__MARKER__MARKERS__POINTS_MARKER_HPP_
-
-#include "rviz_rendering/objects/point_cloud.hpp"
-
-#include "rviz_default_plugins/displays/marker/markers/marker_base.hpp"
-#include "rviz_default_plugins/visibility_control.hpp"
-
-namespace Ogre
-{
-class SceneNode;
-}  // namespace Ogre
+#include "rviz_default_plugins/displays/relative_humidity/relative_humidity_display.hpp"
 
 namespace rviz_default_plugins
 {
+
 namespace displays
 {
-namespace markers
+
+RelativeHumidityDisplay::RelativeHumidityDisplay()
+{}
+
+RelativeHumidityDisplay::~RelativeHumidityDisplay() = default;
+
+void RelativeHumidityDisplay::setInitialValues()
 {
+  subProp("Channel Name")->setValue("relative_humidity");
+  subProp("Autocompute Intensity Bounds")->setValue(false);
+  subProp("Min Intensity")->setValue(0.);
+  subProp("Max Intensity")->setValue(1.);
+}
 
-class RVIZ_DEFAULT_PLUGINS_PUBLIC PointsMarker : public MarkerBase
+void RelativeHumidityDisplay::hideUnneededProperties()
 {
-public:
-  PointsMarker(
-    MarkerCommon * owner, rviz_common::DisplayContext * context, Ogre::SceneNode * parent_node);
+  subProp("Position Transformer")->hide();
+  subProp("Color Transformer")->hide();
+  subProp("Channel Name")->hide();
+  subProp("Autocompute Intensity Bounds")->hide();
+}
 
-  ~PointsMarker() override;
+void RelativeHumidityDisplay::processMessage(
+  sensor_msgs::msg::RelativeHumidity::ConstSharedPtr message)
+{
+  auto point_cloud2_message =
+    createPointCloud2Message(message->header, message->relative_humidity, "relative_humidity");
 
-  void setHighlightColor(float red, float green, float blue);
+  point_cloud_common_->addMessage(point_cloud2_message);
+}
 
-protected:
-  void onNewMessage(
-    const MarkerConstSharedPtr & old_message, const MarkerConstSharedPtr & new_message) override;
-  void transformAndSetVisibility(
-    const MarkerConstSharedPtr & new_message,
-    Ogre::Vector3 & position,
-    Ogre::Vector3 & scale,
-    Ogre::Quaternion & orientation);
-  void setRenderModeAndDimensions(const MarkerConstSharedPtr & new_message, Ogre::Vector3 & scale);
-  void addPointsFromMessage(const MarkerConstSharedPtr & new_message);
-
-  rviz_rendering::PointCloud * points_;
-};
-
-}  // namespace markers
 }  // namespace displays
 }  // namespace rviz_default_plugins
 
-#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__MARKER__MARKERS__POINTS_MARKER_HPP_
+#include <pluginlib/class_list_macros.hpp>  // NOLINT
+PLUGINLIB_EXPORT_CLASS(rviz_default_plugins::displays::RelativeHumidityDisplay,
+  rviz_common::Display)

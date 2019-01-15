@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2018, Bosch Software Innovations GmbH.
+ * Copyright (c) 2008, Willow Garage, Inc.
+ * Copyright (c) 2018, TNG Technology Consulting GmbH.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -10,8 +11,8 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the copyright holder nor the names of its contributors
- *       may be used to endorse or promote products derived from
+ *     * Neither the name of the Willow Garage, Inc. nor the names of its
+ *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -27,19 +28,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RVIZ_DEFAULT_PLUGINS__PAGE_OBJECTS__POINT_CLOUD2_DISPLAY_PAGE_OBJECT_HPP_
-#define RVIZ_DEFAULT_PLUGINS__PAGE_OBJECTS__POINT_CLOUD2_DISPLAY_PAGE_OBJECT_HPP_
+#ifndef RVIZ_DEFAULT_PLUGINS__DISPLAYS__ILLUMINANCE__ILLUMINANCE_DISPLAY_HPP_
+#define RVIZ_DEFAULT_PLUGINS__DISPLAYS__ILLUMINANCE__ILLUMINANCE_DISPLAY_HPP_
 
-#include "rviz_visual_testing_framework/page_objects/base_page_object.hpp"
+#include "rviz_default_plugins/displays/pointcloud/point_cloud_scalar_display.hpp"
+#include "sensor_msgs/msg/illuminance.hpp"
 
-#include "point_cloud_common_page_object.hpp"
-
-class PointCloud2DisplayPageObject : public PointCloudCommonPageObject
+namespace rviz_default_plugins
 {
-public:
-  PointCloud2DisplayPageObject();
 
-  void setQueueSize(int queue_size);
+class PointCloudCommon;
+
+namespace displays
+{
+
+/// Display an Illuminance message of type sensor_msgs::Illuminance
+/**
+ * \class IlluminanceDisplay
+ */
+
+class RVIZ_DEFAULT_PLUGINS_PUBLIC IlluminanceDisplay
+  : public PointCloudScalarDisplay<sensor_msgs::msg::Illuminance>
+{
+  Q_OBJECT
+
+public:
+  IlluminanceDisplay();
+  ~IlluminanceDisplay() override;
+
+private:
+  void processMessage(const sensor_msgs::msg::Illuminance::ConstSharedPtr message) override;
+
+  void setInitialValues() override;
+  void hideUnneededProperties() override;
 };
 
-#endif  // RVIZ_DEFAULT_PLUGINS__PAGE_OBJECTS__POINT_CLOUD2_DISPLAY_PAGE_OBJECT_HPP_
+}  // namespace displays
+}  // namespace rviz_default_plugins
+
+#endif  // RVIZ_DEFAULT_PLUGINS__DISPLAYS__ILLUMINANCE__ILLUMINANCE_DISPLAY_HPP_
