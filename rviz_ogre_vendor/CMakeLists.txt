@@ -22,11 +22,20 @@ endif()
 
 macro(build_freetype)
   set(extra_cmake_args)
+  set(FREETYPE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
   if(WIN32)
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w")
+    list(APPEND FREETYPE_CXX_FLAGS "/w")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w")
   endif()
+
+  if(DEFINED CMAKE_TOOLCHAIN_FILE)
+    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  else()
+    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  endif()
+  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${FREETYPE_CXX_FLAGS}")
 
   include(ExternalProject)
   ExternalProject_Add(freetype-2.8.1
@@ -51,11 +60,20 @@ endmacro()
 
 macro(build_zlib)
   set(extra_cmake_args)
+  set(ZLIB_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
   if(WIN32)
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w")
+    list(APPEND ZLIB_CXX_FLAGS "/w")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w")
   endif()
+
+  if(DEFINED CMAKE_TOOLCHAIN_FILE)
+    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  else()
+    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  endif()
+  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${ZLIB_CXX_FLAGS}")
 
   include(ExternalProject)
   ExternalProject_Add(zlib-1.2.11
@@ -80,22 +98,31 @@ endmacro()
 
 macro(build_ogre)
   set(extra_cmake_args)
+  set(OGRE_CXX_FLAGS)
+  # standard library is important for linking, but the other cxx flags are not
+  if(CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
+    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -stdlib=libc++")
+  endif()
+
   if(DEFINED CMAKE_BUILD_TYPE)
     list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
   endif()
+
   if(WIN32)
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w /EHsc")
+    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} /w /EHsc")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w /EHsc")
   elseif(APPLE)
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=-std=c++14 -stdlib=libc++ -w")
+    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -std=c++14 -stdlib=libc++ -w")
     list(APPEND extra_cmake_args "-DCMAKE_OSX_ARCHITECTURES='x86_64'")
-  else()
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=-std=c++14 -w")
+  else()  # Linux
+    # include Clang -Wno-everything to disable warnings in that build. GCC doesn't mind it
+    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -std=c++14 -w -Wno-everything")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=-w")
   endif()
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_GL:BOOL=TRUE")
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_D3D11:BOOL=OFF")
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_D3D9:BOOL=OFF")
+  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${OGRE_CXX_FLAGS}")
 
   # Uncomment this line to enable the GL3PLUS render engine
   # list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=TRUE")
@@ -118,6 +145,13 @@ macro(build_ogre)
     set(patch_exe patch.exe)
   else()
     set(patch_exe patch)
+  endif()
+
+  if(DEFINED CMAKE_TOOLCHAIN_FILE)
+    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  else()
+    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
   endif()
 
   include(ExternalProject)

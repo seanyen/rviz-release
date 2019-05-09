@@ -65,7 +65,7 @@ public:
     timer_(nullptr),
     publisher_(nullptr)
   {
-    publisher_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("pointcloud2");
+    publisher_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("pointcloud2", 10);
     timer_ = this->create_wall_timer(500ms, std::bind(&PointCloud2Publisher::timer_callback, this));
   }
 
@@ -75,7 +75,7 @@ private:
     auto message = rviz_default_plugins::createPointCloud2WithPoints({{0, 0, 0}});
     message->header.frame_id = "pointcloud2_frame";
 
-    publisher_->publish(message);
+    publisher_->publish(*message);
   }
 
   rclcpp::TimerBase::SharedPtr timer_;
