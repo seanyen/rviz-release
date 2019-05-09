@@ -1,3 +1,37 @@
+## rviz (dashing) - 6.0.0-1
+
+The packages in the `rviz` repository were released into the `dashing` distro by running `/usr/local/bin/bloom-release -r dashing -t dashing rviz` on `Thu, 09 May 2019 01:09:00 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+These packages were explicitly ignored:
+- `rviz`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `6.0.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.8.0`
+- catkin_pkg version: `0.4.12`
+- rosdep version: `0.15.1`
+- rosdistro version: `0.7.2`
+- vcstools version: `0.1.40`
+
+
 ## rviz (crystal) - 5.1.0-0
 
 The packages in the `rviz` repository were released into the `crystal` distro by running `/Users/william/.pyenv/versions/2.7.15/bin/bloom-release -r crystal -t crystal rviz` on `Tue, 15 Jan 2019 02:05:53 -0000`
