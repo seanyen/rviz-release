@@ -1,4 +1,4 @@
-From 60dc16e72ca37a6fdffb40ffbbc1c2e20f300ff3 Mon Sep 17 00:00:00 2001
+From 545302942434907ee1a2f93534c4c50c0b7f977f Mon Sep 17 00:00:00 2001
 From: William Woodall <william@osrfoundation.org>
 Date: Thu, 9 May 2019 00:24:57 -0700
 Subject: [PATCH] migrate crystal patch
