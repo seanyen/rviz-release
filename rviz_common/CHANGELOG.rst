@@ -2,6 +2,11 @@
 Changelog for package rviz_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.1.2 (2019-06-12)
+------------------
+* Changed the clock used to stamp publications, using one attached to a node instead so ``use_sim_time`` will work. (`#407 <https://github.com/ros2/rviz/issues/407>`_)
+* Contributors: Scott K Logan
+
 6.1.1 (2019-05-29)
 ------------------
 
