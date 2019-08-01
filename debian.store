@@ -1,1 +1,1 @@
-{"base": "4700b6f", "parent": "debian/dashing/rviz_default_plugins", "previous": "3241783", "trim": "", "trimbase": ""}
+{"trim": "", "base": "d3cdb6a", "trimbase": "", "parent": "debian/dashing/rviz_default_plugins", "previous": "6cfefa8"}
