@@ -1,4 +1,4 @@
-From 2236e80ec1fefdde2d2d5f6275ac5e55f164f2fa Mon Sep 17 00:00:00 2001
+From 82b4a868597baca8829782cba3fe76944fbac54d Mon Sep 17 00:00:00 2001
 From: William Woodall <william@osrfoundation.org>
 Date: Thu, 9 May 2019 00:23:38 -0700
 Subject: [PATCH] migrate patch from crystal
@@ -21,5 +21,5 @@ index 9c9604d..ebc5f61 100755
  override_dh_auto_install:
  	# In case we're installing to a non-standard location, look for a setup.sh
 -- 
-2.17.1
+2.20.1 (Apple Git-117)
 
