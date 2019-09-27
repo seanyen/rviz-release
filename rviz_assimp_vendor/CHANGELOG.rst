@@ -2,14 +2,10 @@
 Changelog for package rviz_assimp_vendor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-6.1.4 (2019-09-06)
+7.0.0 (2019-09-27)
 ------------------
-
-6.1.3 (2019-07-31)
-------------------
-
-6.1.2 (2019-06-12)
-------------------
+* Add .dsv file beside custom environment hook (`#466 <https://github.com/ros2/rviz/issues/466>`_)
+* Contributors: Dirk Thomas
 
 6.1.1 (2019-05-29)
 ------------------

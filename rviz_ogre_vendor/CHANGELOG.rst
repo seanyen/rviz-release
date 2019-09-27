@@ -2,16 +2,12 @@
 Changelog for package rviz_ogre_vendor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-6.1.4 (2019-09-06)
+7.0.0 (2019-09-27)
 ------------------
-
-6.1.3 (2019-07-31)
-------------------
-* Mojave compatibility (`#414 <https://github.com/ros2/rviz/issues/414>`_) (`#433 <https://github.com/ros2/rviz/issues/433>`_)
-* Contributors: Karsten Knese
-
-6.1.2 (2019-06-12)
-------------------
+* Add .dsv file beside custom environment hook (`#449 <https://github.com/ros2/rviz/issues/449>`_)
+* Upgrade from Ogre 1.10 to Ogre 1.12.1 (`#394 <https://github.com/ros2/rviz/issues/394>`_)
+* Mojave compatibility (`#414 <https://github.com/ros2/rviz/issues/414>`_)
+* Contributors: Dirk Thomas, Karsten Knese, Martin Idel
 
 6.1.1 (2019-05-29)
 ------------------

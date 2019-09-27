@@ -18,11 +18,11 @@ For some displays, the [documentation is updated](docs/FEATURES.md).
 | Fluid Pressure        | Focus Camera  | XY Orbit              | Help            |
 | Grid                  | Measure       | First Person          | Selections      |
 | Grid Cells            | Select        | Third Person Follower | Tool Properties | 
-| Illuminance           | 2D Nav Goal   | Top Down Orthographic | Views           |
+| Illuminance           | 2D Goal Pose  | Top Down Orthographic | Views           |
 | Image                 | Publish Point |
 | Laser Scan            | Initial Pose  |
-| Map                   | 
-| Marker                | 
+| Map                   | Interact      |
+| Marker                |
 | Marker Array          |
 | Odometry              |
 | Point Cloud (1 and 2) |
@@ -35,6 +35,7 @@ For some displays, the [documentation is updated](docs/FEATURES.md).
 | Robot Model           |
 | Temperature           |
 | TF                    |
+| Wrench                |
 
 
 ### Not yet ported
@@ -42,13 +43,12 @@ These features have not been ported to `ros2/rviz` yet.
 
 | Displays             | Tools        | Panels |
 | -------------------- | ------------ | ------ |
-| Axes                 | Interact     | Time   |
+| Axes                 |              | Time   |
 | DepthCloud           |
 | Effort               |
 | Interactive Marker   |
 | Oculus               |
 | Pose With Covariance |
-| Wrench               |
 
 Other features:
 - Filtering of Topic lists by topic type
