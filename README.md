@@ -1,3 +1,37 @@
+## rviz (eloquent) - 7.0.0-2
+
+The packages in the `rviz` repository were released into the `eloquent` distro by running `/home/jacob/.local/bin/bloom-release -r eloquent -t eloquent rviz` on `Mon, 30 Sep 2019 19:28:18 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+These packages were explicitly ignored:
+- `rviz`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `7.0.0-1`
+- new version: `7.0.0-2`
+
+Versions of tools used:
+
+- bloom version: `0.8.0`
+- catkin_pkg version: `0.4.13`
+- rosdep version: `0.16.1`
+- rosdistro version: `0.7.4`
+- vcstools version: `0.1.42`
+
+
 ## rviz (eloquent) - 7.0.0-1
 
 The packages in the `rviz` repository were released into the `eloquent` distro by running `/home/jacob/.local/bin/bloom-release -r eloquent -t eloquent rviz` on `Mon, 30 Sep 2019 18:38:24 -0000`
