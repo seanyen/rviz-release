@@ -2,6 +2,11 @@
 Changelog for package rviz_ogre_vendor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.1 (2019-10-04)
+------------------
+* Fix the rviz_ogre_vendor packaging.
+* Contributors: Chris Lalancette
+
 7.0.0 (2019-09-27)
 ------------------
 * Add .dsv file beside custom environment hook (`#449 <https://github.com/ros2/rviz/issues/449>`_)
