@@ -1,4 +1,4 @@
-From 7ab4a8810f42c6b8c084cfec817bd3b86399fe87 Mon Sep 17 00:00:00 2001
+From b3c8d5c1f98c62da1c94385b15c519b9cc5e4d32 Mon Sep 17 00:00:00 2001
 From: Jacob Perron <jacob@openrobotics.org>
 Date: Mon, 30 Sep 2019 12:22:29 -0700
 Subject: [PATCH] Migrate patch from Dashing
@@ -9,7 +9,7 @@ Signed-off-by: Jacob Perron <jacob@openrobotics.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/debian/rules.em b/debian/rules.em
-index 9c9604d..8b003fb 100755
+index 9c9604d9..8b003fba 100755
 --- a/debian/rules.em
 +++ b/debian/rules.em
 @@ -50,7 +50,7 @@ override_dh_shlibdeps:
@@ -22,5 +22,5 @@ index 9c9604d..8b003fb 100755
  override_dh_auto_install:
  	# In case we're installing to a non-standard location, look for a setup.sh
 -- 
-2.17.1
+2.20.1
 
