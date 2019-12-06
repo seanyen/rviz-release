@@ -62,7 +62,7 @@ private:
 RelativeHumidityPublisher::RelativeHumidityPublisher()
 : Node("relative_humidity_publisher"), relative_humidity_(0.)
 {
-  publisher_ = this->create_publisher<sensor_msgs::msg::RelativeHumidity>("relative_humidity", 10);
+  publisher_ = this->create_publisher<sensor_msgs::msg::RelativeHumidity>("relative_humidity");
 
   auto timer_callback =
     [this]() -> void {

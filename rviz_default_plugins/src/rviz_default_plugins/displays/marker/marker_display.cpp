@@ -32,20 +32,23 @@
 
 #include <memory>
 
+#include "rviz_common/properties/queue_size_property.hpp"
+
 namespace rviz_default_plugins
 {
 namespace displays
 {
 
 MarkerDisplay::MarkerDisplay()
-: rviz_common::MessageFilterDisplay<visualization_msgs::msg::Marker>(),
-  marker_common_(std::make_unique<MarkerCommon>(this))
-{}
+: rviz_common::RosTopicDisplay<visualization_msgs::msg::Marker>(),
+  marker_common_(std::make_unique<MarkerCommon>(this)),
+  queue_size_property_(std::make_unique<rviz_common::QueueSizeProperty>(this, 10)) {}
 
 void MarkerDisplay::onInitialize()
 {
-  MFDClass::onInitialize();
+  RTDClass::onInitialize();
   marker_common_->initialize(context_, scene_node_);
+
   topic_property_->setDescription(
     "visualization_msgs::msg::Marker topic to subscribe to. <topic>_array will also"
     " automatically be subscribed with type visualization_msgs::msg::MarkerArray.");
@@ -59,7 +62,7 @@ void MarkerDisplay::load(const rviz_common::Config & config)
 
 void MarkerDisplay::subscribe()
 {
-  MFDClass::subscribe();
+  RTDClass::subscribe();
 
   if ((!isEnabled()) || (topic_property_->getTopicStd().empty())) {
     return;
@@ -75,10 +78,10 @@ void MarkerDisplay::createMarkerArraySubscription()
     array_sub_ = rviz_ros_node_.lock()->get_raw_node()->
       template create_subscription<visualization_msgs::msg::MarkerArray>(
       topic_property_->getTopicStd() + "_array",
-      qos_profile,
       [this](visualization_msgs::msg::MarkerArray::ConstSharedPtr msg) {
         marker_common_->addMessage(msg);
-      });
+      },
+      qos_profile);
     setStatus(StatusLevel::Ok, "Array Topic", "OK");
   } catch (rclcpp::exceptions::InvalidTopicNameError & e) {
     setStatus(StatusLevel::Error, "Array Topic", QString("Error subscribing: ") + e.what());
@@ -87,7 +90,7 @@ void MarkerDisplay::createMarkerArraySubscription()
 
 void MarkerDisplay::unsubscribe()
 {
-  MFDClass::unsubscribe();
+  RTDClass::unsubscribe();
   array_sub_.reset();
 }
 
@@ -104,7 +107,7 @@ void MarkerDisplay::update(float wall_dt, float ros_dt)
 
 void MarkerDisplay::reset()
 {
-  MFDClass::reset();
+  RTDClass::reset();
   marker_common_->clearMarkers();
 }
 

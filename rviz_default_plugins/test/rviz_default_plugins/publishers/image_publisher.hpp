@@ -60,7 +60,7 @@ public:
   ImagePublisher()
   : Node("image_publisher")
   {
-    publisher = this->create_publisher<sensor_msgs::msg::Image>("image", 10);
+    publisher = this->create_publisher<sensor_msgs::msg::Image>("image");
     timer = this->create_wall_timer(100ms, std::bind(&ImagePublisher::timer_callback, this));
   }
 

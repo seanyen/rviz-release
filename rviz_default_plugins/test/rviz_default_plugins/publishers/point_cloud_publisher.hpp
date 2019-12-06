@@ -64,7 +64,7 @@ public:
     publisher_(nullptr),
     points_(points)
   {
-    publisher_ = this->create_publisher<sensor_msgs::msg::PointCloud>("pointcloud", 10);
+    publisher_ = this->create_publisher<sensor_msgs::msg::PointCloud>("pointcloud");
     timer_ = this->create_wall_timer(500ms, std::bind(&PointCloudPublisher::timer_callback, this));
   }
 

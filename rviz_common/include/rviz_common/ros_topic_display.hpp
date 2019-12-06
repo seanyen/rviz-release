@@ -32,7 +32,6 @@
 
 #ifndef Q_MOC_RUN
 
-#include <memory>
 #include <string>
 
 #include <OgreSceneNode.h>
@@ -40,16 +39,24 @@
 
 #endif
 
-#include "rclcpp/qos.hpp"
+#include "rmw/types.h"
 
 #include "rviz_common/display.hpp"
 #include "rviz_common/display_context.hpp"
 #include "frame_manager_iface.hpp"
 #include "rviz_common/properties/ros_topic_property.hpp"
-#include "rviz_common/properties/qos_profile_property.hpp"
 #include "rviz_common/properties/status_property.hpp"
 #include "rviz_common/ros_integration/ros_node_abstraction_iface.hpp"
 #include "rviz_common/visibility_control.hpp"
+
+static const rmw_qos_profile_t display_default =
+{
+  RMW_QOS_POLICY_HISTORY_KEEP_LAST,
+  5,
+  RMW_QOS_POLICY_RELIABILITY_RELIABLE,
+  RMW_QOS_POLICY_DURABILITY_SYSTEM_DEFAULT,
+  false
+};
 
 namespace rviz_common
 {
@@ -64,12 +71,22 @@ class RVIZ_COMMON_PUBLIC _RosTopicDisplay : public Display
 public:
   _RosTopicDisplay()
   : rviz_ros_node_(),
-    qos_profile(5)
+    qos_profile(display_default)
   {
     topic_property_ = new properties::RosTopicProperty("Topic", "",
         "", "", this, SLOT(updateTopic()));
+    unreliable_property_ = new properties::BoolProperty(
+      "Unreliable", false, "Prefer UDP topic transport", this, SLOT(updateReliability()));
+  }
 
-    qos_profile_property_ = new properties::QosProfileProperty(topic_property_, qos_profile);
+  using changeQoSProfile = std::function<rmw_qos_profile_t(rmw_qos_profile_t)>;
+
+  virtual void updateQoSProfile(changeQoSProfile change_profile)
+  {
+    qos_profile = change_profile(qos_profile);
+    if (!rviz_ros_node_.expired()) {
+      updateTopic();
+    }
   }
 
   /**
@@ -80,33 +97,26 @@ public:
   {
     rviz_ros_node_ = context_->getRosNodeAbstraction();
     topic_property_->initialize(rviz_ros_node_);
-
-    connect(
-      reinterpret_cast<QObject *>(context_->getTransformationManager()),
-      SIGNAL(transformerChanged(std::shared_ptr<rviz_common::transformation::FrameTransformer>)),
-      this,
-      SLOT(transformerChangedCallback()));
-    qos_profile_property_->initialize(
-      [this](rclcpp::QoS profile) {
-        this->qos_profile = profile;
-        updateTopic();
-      });
   }
 
 protected Q_SLOTS:
-  virtual void transformerChangedCallback()
-  {
-  }
   virtual void updateTopic() = 0;
+  virtual void updateReliability()
+  {
+    qos_profile.reliability = unreliable_property_->getBool() ?
+      RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT :
+      RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+    updateTopic();
+  }
 
 protected:
   /** @brief A Node which is registered with the main executor (used in the "update" thread).
    *
    * This is configured after the constructor within the initialize() method of Display. */
   ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node_;
-  rclcpp::QoS qos_profile;
+  rmw_qos_profile_t qos_profile;
   properties::RosTopicProperty * topic_property_;
-  properties::QosProfileProperty * qos_profile_property_;
+  properties::BoolProperty * unreliable_property_;
 };
 
 /** @brief Display subclass using a rclcpp::subscription, templated on the ROS message type.
@@ -178,8 +188,8 @@ protected:
       subscription_ =
         rviz_ros_node_.lock()->get_raw_node()->template create_subscription<MessageType>(
         topic_property_->getTopicStd(),
-        qos_profile,
-        [this](const typename MessageType::ConstSharedPtr message) {incomingMessage(message);});
+        [this](const typename MessageType::ConstSharedPtr message) {incomingMessage(message);},
+        qos_profile);
       setStatus(properties::StatusProperty::Ok, "Topic", "OK");
     } catch (rclcpp::exceptions::InvalidTopicNameError & e) {
       setStatus(properties::StatusProperty::Error, "Topic",

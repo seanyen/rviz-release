@@ -2,56 +2,10 @@
 Changelog for package rviz_ogre_vendor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-7.0.3 (2019-11-13)
+5.1.1 (2019-12-06)
 ------------------
-* Skip freetype2 dependencies (`#405 <https://github.com/ros2/rviz/issues/405>`_)
+* Constraint Freetype dependencies for more predictable build result on Windows. (`#393 <https://github.com/ros2/rviz/issues/393>`_)
 * Contributors: Sean Yen
-
-7.0.2 (2019-10-23)
-------------------
-* Switch back to patch instead of git apply (`#470 <https://github.com/ros2/rviz/issues/470>`_)
-* Remove OGRE_BUILD_COMPONENT_SAMPLES cmake arg.
-* Contributors: Chris Lalancette
-
-7.0.1 (2019-10-04)
-------------------
-* Fix the rviz_ogre_vendor packaging.
-* Contributors: Chris Lalancette
-
-7.0.0 (2019-09-27)
-------------------
-* Add .dsv file beside custom environment hook (`#449 <https://github.com/ros2/rviz/issues/449>`_)
-* Upgrade from Ogre 1.10 to Ogre 1.12.1 (`#394 <https://github.com/ros2/rviz/issues/394>`_)
-* Mojave compatibility (`#414 <https://github.com/ros2/rviz/issues/414>`_)
-* Contributors: Dirk Thomas, Karsten Knese, Martin Idel
-
-6.1.1 (2019-05-29)
-------------------
-
-6.1.0 (2019-05-20)
-------------------
-* Upgraded to OGRE 1.10.12 to get a macOS fix but also not break any APIs by upgrading to OGRE 1.11.x. (`#380 <https://github.com/ros2/rviz/issues/380>`_)
-* Contributors: Emerson Knapp
-
-6.0.0 (2019-05-08)
-------------------
-* Suppress ogre_vendor warnings in clang+libcxx build. The -w flag was not strong enough for Clang builds. (`#389 <https://github.com/ros2/rviz/issues/389>`_)
-  Signed-off-by: Emerson Knapp <eknapp@amazon.com>
-* Pass through only the stdlib flag to the vendor build, instead of all C++ flags (`#388 <https://github.com/ros2/rviz/issues/388>`_)
-  Signed-off-by: Emerson Knapp <eknapp@amazon.com>
-* Pass through CXX flags to OGRE vendor build (`#381 <https://github.com/ros2/rviz/issues/381>`_)
-  * Pass through CXX flags
-  Signed-off-by: Emerson Knapp <eknapp@amazon.com>
-  * fixup
-  Signed-off-by: William Woodall <william@osrfoundation.org>
-  * re-add removed libc++ flag, because OSX build always needs it
-  Signed-off-by: Emerson Knapp <eknapp@amazon.com>
-* Propagate toolchain-file to external-project (`#374 <https://github.com/ros2/rviz/issues/374>`_)
-  If defined, propagate the CMAKE_TOOLCHAIN_FILE argument to the cmake
-  argument of freetype, zlib and ogre projects.
-  Change-Id: Ibf2802b96c2238a06191e78a1b2a3128769a83af
-  Signed-off-by: Louis Mayencourt <louis.mayencourt@arm.com>
-* Contributors: Emerson Knapp, lmayencourt
 
 5.1.0 (2019-01-14)
 ------------------

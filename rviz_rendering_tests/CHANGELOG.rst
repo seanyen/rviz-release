@@ -2,32 +2,7 @@
 Changelog for package rviz_rendering_tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-7.0.3 (2019-11-13)
-------------------
-
-7.0.2 (2019-10-23)
-------------------
-
-7.0.1 (2019-10-04)
-------------------
-
-7.0.0 (2019-09-27)
-------------------
-* Fix assert in mesh_loader_test (`#446 <https://github.com/ros2/rviz/issues/446>`_)
-* Remove non-package from ament_target_dependencies() (`#428 <https://github.com/ros2/rviz/issues/428>`_)
-* Remove -Werror from defualt compiler options (`#420 <https://github.com/ros2/rviz/issues/420>`_)
-* Fix STL loader (`#410 <https://github.com/ros2/rviz/issues/410>`_)
-* Contributors: Hunter L. Allen, Martin Idel, Shane Loretz, Zachary Michaels
-
-6.1.1 (2019-05-29)
-------------------
-* Updated test to match changes from `#404 <https://github.com/ros2/rviz/issues/404>`_
-* Contributors: Dirk Thomas
-
-6.1.0 (2019-05-20)
-------------------
-
-6.0.0 (2019-05-08)
+5.1.1 (2019-12-06)
 ------------------
 
 5.1.0 (2019-01-14)

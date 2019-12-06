@@ -50,7 +50,7 @@ public:
   RangePublisher()
   : Node("range_publisher")
   {
-    publisher = this->create_publisher<sensor_msgs::msg::Range>("range", 10);
+    publisher = this->create_publisher<sensor_msgs::msg::Range>("range");
     timer = this->create_wall_timer(500ms, std::bind(&RangePublisher::timer_callback, this));
   }
 

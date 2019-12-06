@@ -49,7 +49,7 @@ public:
   GridCellsPublisher()
   : Node("grid_cells_publisher")
   {
-    publisher = this->create_publisher<nav_msgs::msg::GridCells>("grid_cells", 10);
+    publisher = this->create_publisher<nav_msgs::msg::GridCells>("grid_cells");
     timer = this->create_wall_timer(500ms, std::bind(&GridCellsPublisher::timer_callback, this));
   }
 

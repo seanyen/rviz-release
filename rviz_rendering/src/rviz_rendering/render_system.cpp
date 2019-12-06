@@ -48,7 +48,6 @@
 
 #include "ament_index_cpp/get_resource.hpp"
 #include "ament_index_cpp/get_resources.hpp"
-#include "rviz_rendering/material_manager.hpp"
 #include "rviz_rendering/logging.hpp"
 #include "rviz_rendering/ogre_logging.hpp"
 #include "rviz_rendering/resource_config.hpp"
@@ -192,7 +191,6 @@ RenderSystem::loadOgrePlugins()
 #else
   ogre_root_->loadPlugin(plugin_prefix + "RenderSystem_GL");
 #endif
-  ogre_root_->loadPlugin(plugin_prefix + "Codec_STBI");
 // #if __APPLE__
 // #else
 // ogre_root_->loadPlugin(plugin_prefix + "RenderSystem_GL3Plus");
@@ -356,7 +354,6 @@ RenderSystem::setupResources()
   }
 
   addAdditionalResourcesFromAmentIndex();
-  MaterialManager::createDefaultMaterials();
 }
 
 void RenderSystem::addAdditionalResourcesFromAmentIndex() const

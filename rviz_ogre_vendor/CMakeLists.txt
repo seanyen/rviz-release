@@ -22,20 +22,11 @@ endif()
 
 macro(build_freetype)
   set(extra_cmake_args)
-  set(FREETYPE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
   if(WIN32)
-    list(APPEND FREETYPE_CXX_FLAGS "/w")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w")
   endif()
-
-  if(DEFINED CMAKE_TOOLCHAIN_FILE)
-    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-  else()
-    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-  endif()
-  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${FREETYPE_CXX_FLAGS}")
 
   include(ExternalProject)
   ExternalProject_Add(freetype-2.8.1
@@ -64,20 +55,11 @@ endmacro()
 
 macro(build_zlib)
   set(extra_cmake_args)
-  set(ZLIB_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
   if(WIN32)
-    list(APPEND ZLIB_CXX_FLAGS "/w")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w")
   endif()
-
-  if(DEFINED CMAKE_TOOLCHAIN_FILE)
-    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-  else()
-    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-  endif()
-  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${ZLIB_CXX_FLAGS}")
 
   include(ExternalProject)
   ExternalProject_Add(zlib-1.2.11
@@ -102,36 +84,29 @@ endmacro()
 
 macro(build_ogre)
   set(extra_cmake_args)
-  set(OGRE_CXX_FLAGS)
-  # standard library is important for linking, but the other cxx flags are not
-  if(CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
-    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -stdlib=libc++")
-  endif()
-
   if(DEFINED CMAKE_BUILD_TYPE)
     list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
   endif()
-
   if(WIN32)
-    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} /w /EHsc")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w /EHsc")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w /EHsc")
   elseif(APPLE)
-    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -std=c++14 -stdlib=libc++ -w")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=-std=c++14 -stdlib=libc++ -w")
     list(APPEND extra_cmake_args "-DCMAKE_OSX_ARCHITECTURES='x86_64'")
-  else()  # Linux
-    # include Clang -Wno-everything to disable warnings in that build. GCC doesn't mind it
-    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -std=c++14 -w -Wno-everything")
+  else()
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=-std=c++14 -w")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=-w")
   endif()
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_GL:BOOL=TRUE")
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_D3D11:BOOL=OFF")
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_D3D9:BOOL=OFF")
-  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${OGRE_CXX_FLAGS}")
 
   # Uncomment this line to enable the GL3PLUS render engine
   # list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=TRUE")
 
   # These next lines can be used to disable some of the components or plugins for OGRE
+  # list(APPEND extra_cmake_args "-DOGRE_BUILD_COMPONENT_BITES:BOOL=OFF")
+  # list(APPEND extra_cmake_args "-DOGRE_BUILD_COMPONENT_HLMS:BOOL=ON")
   list(APPEND extra_cmake_args "-DOGRE_CONFIG_ENABLE_ZIP:BOOL=ON")
 
   if(BUILDING_FREETYPE_LOCALLY)
@@ -140,20 +115,19 @@ macro(build_ogre)
   endif()
   if(BUILDING_ZLIB_LOCALLY)
     list(APPEND extra_cmake_args
-      "-DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/zlib-install")
+      "-DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/zlib_install")
   endif()
 
-  if(DEFINED CMAKE_TOOLCHAIN_FILE)
-    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  if(WIN32)
+    set(patch_exe patch.exe)
   else()
-    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+    set(patch_exe patch)
   endif()
 
   include(ExternalProject)
-  ExternalProject_Add(ogre-v1.12.1
-    URL https://github.com/OGRECave/ogre/archive/v1.12.1.zip
-    URL_MD5 cdbea4006d223c173e0a93864111b936
+  ExternalProject_Add(ogre-master-ca665a6
+    URL https://github.com/OGRECave/ogre/archive/v1.10.11.zip
+    URL_MD5 6ffd5048fae72805e287bfc0b462b2ea
     TIMEOUT 1200
     LOG_CONFIGURE ${should_log}
     LOG_BUILD ${should_log}
@@ -167,26 +141,20 @@ macro(build_ogre)
       -DOGRE_INSTALL_SAMPLES:BOOL=FALSE
       -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=FALSE
       -DOGRE_CONFIG_THREADS:STRING=0
-      -DOGRE_RESOURCEMANAGER_STRICT:STRING=2
+      -DOGRE_RESOURCEMANAGER_STRICT:BOOL=ON
       -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ogre_install
       -DOGRE_BUILD_LIBS_AS_FRAMEWORKS:BOOL=OFF
-      -DOGRE_BUILD_COMPONENT_PYTHON:BOOL=FALSE
-      -DOGRE_BUILD_COMPONENT_JAVA:BOOL=FALSE
-      -DOGRE_BUILD_COMPONENT_CSHARP:BOOL=FALSE
-      -DOGRE_BUILD_COMPONENT_BITES:BOOL=FALSE
       ${extra_cmake_args}
       -Wno-dev
     PATCH_COMMAND
-      ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> patch${CMAKE_EXECUTABLE_SUFFIX} -p1 -N < ${CMAKE_CURRENT_SOURCE_DIR}/pragma-patch.diff
-    COMMAND
-      ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/FindFreetype.cmake ${CMAKE_CURRENT_BINARY_DIR}/ogre-v1.12.1-prefix/src/ogre-v1.12.1/CMake/Packages/FindFreetype.cmake
+      ${patch_exe} -p1 -N < ${CMAKE_CURRENT_SOURCE_DIR}/ogre-ca665a6-patch.diff
   )
 
   if(BUILDING_FREETYPE_LOCALLY)
-    add_dependencies(ogre-v1.12.1 freetype-2.8.1)
+    add_dependencies(ogre-master-ca665a6 freetype-2.8.1)
   endif()
   if(BUILDING_ZLIB_LOCALLY)
-    add_dependencies(ogre-v1.12.1 zlib-1.2.11)
+    add_dependencies(ogre-master-ca665a6 zlib-1.2.11)
   endif()
 
   # The external project will install to the build folder, but we'll install that on make install.
@@ -209,18 +177,9 @@ build_ogre()
 
 if(WIN32)
   ament_environment_hooks(env_hook/rviz_ogre_vendor_library_path.bat)
-  set(ENV_VAR_NAME "PATH")
-  set(ENV_VAR_VALUE "opt\\rviz_ogre_vendor\\bin")
 else()
   ament_environment_hooks(env_hook/rviz_ogre_vendor_library_path.sh)
-  if(APPLE)
-    set(ENV_VAR_NAME "DYLD_LIBRARY_PATH")
-  else()
-    set(ENV_VAR_NAME "LD_LIBRARY_PATH")
-  endif()
-  set(ENV_VAR_VALUE "opt/rviz_ogre_vendor/lib")
 endif()
-ament_environment_hooks(env_hook/rviz_ogre_vendor_library_path.dsv.in)
 
 ament_package(
   CONFIG_EXTRAS "rviz_ogre_vendor-extras.cmake.in"
