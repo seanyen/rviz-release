@@ -1,4 +1,4 @@
-From 7426edc2b6e382d3991af27b793cadcafafd722c Mon Sep 17 00:00:00 2001
+From 95f36bf5741776231672ce227c22a7b597da7982 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?=
  <nuclearsandwich@users.noreply.github.com>
 Date: Thu, 6 Dec 2018 14:20:09 -0500
@@ -9,7 +9,7 @@ Subject: [PATCH] Tell shlibdeps where to find vendor libraries. (#6)
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/debian/rules.em b/debian/rules.em
-index 9c9604d..3db3fc9 100755
+index 9c9604d9..3db3fc96 100755
 --- a/debian/rules.em
 +++ b/debian/rules.em
 @@ -50,7 +50,7 @@ override_dh_shlibdeps:
@@ -22,5 +22,5 @@ index 9c9604d..3db3fc9 100755
  override_dh_auto_install:
  	# In case we're installing to a non-standard location, look for a setup.sh
 -- 
-2.18.0
+2.17.1
 
