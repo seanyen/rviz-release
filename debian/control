@@ -1,0 +1,12 @@
+Source: ros-crystal-rviz-default-plugins
+Section: misc
+Priority: optional
+Maintainer: William Woodall <william@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-crystal-ament-cmake, ros-crystal-ament-cmake-cppcheck, ros-crystal-ament-cmake-cpplint, ros-crystal-ament-cmake-gmock, ros-crystal-ament-cmake-gtest, ros-crystal-ament-cmake-lint-cmake, ros-crystal-ament-cmake-uncrustify, ros-crystal-ament-index-cpp, ros-crystal-geometry-msgs, ros-crystal-laser-geometry, ros-crystal-map-msgs, ros-crystal-nav-msgs, ros-crystal-pluginlib, ros-crystal-rclcpp, ros-crystal-resource-retriever, ros-crystal-rviz-common, ros-crystal-rviz-rendering, ros-crystal-rviz-rendering-tests, ros-crystal-rviz-visual-testing-framework, ros-crystal-tinyxml-vendor, ros-crystal-urdf, ros-crystal-visualization-msgs, ros-crystal-ros-workspace
+Homepage: https://github.com/ros2/rviz/blob/ros2/README.md
+Standards-Version: 3.9.2
+
+Package: ros-crystal-rviz-default-plugins
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5opengl5, libqt5widgets5, ros-crystal-geometry-msgs, ros-crystal-laser-geometry, ros-crystal-map-msgs, ros-crystal-nav-msgs, ros-crystal-pluginlib, ros-crystal-rclcpp, ros-crystal-resource-retriever, ros-crystal-rviz-common, ros-crystal-rviz-rendering, ros-crystal-tinyxml-vendor, ros-crystal-urdf, ros-crystal-visualization-msgs, ros-crystal-ros-workspace
+Description: Several default plugins for rviz to cover the basic functionality.
