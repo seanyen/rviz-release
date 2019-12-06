@@ -1,3 +1,37 @@
+## rviz (crystal) - 5.1.1-1
+
+The packages in the `rviz` repository were released into the `crystal` distro by running `/home/jacob/.local/bin/bloom-release rviz --rosdistro crystal --track crystal --edit` on `Fri, 06 Dec 2019 18:24:48 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+These packages were explicitly ignored:
+- `rviz`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: https://github.com/ros2-gbp/rviz-release.git
+- rosdistro version: `5.1.0-0`
+- old version: `5.1.0-0`
+- new version: `5.1.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.0`
+- catkin_pkg version: `0.4.13`
+- rosdep version: `0.16.1`
+- rosdistro version: `0.7.5`
+- vcstools version: `0.1.42`
+
+
 ## rviz (eloquent) - 7.0.3-1
 
 The packages in the `rviz` repository were released into the `eloquent` distro by running `/home/mjcarroll/.local/bin/bloom-release --ros-distro eloquent rviz` on `Wed, 13 Nov 2019 17:56:57 -0000`
