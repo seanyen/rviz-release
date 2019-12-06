@@ -1,0 +1,12 @@
+Source: ros-crystal-rviz-rendering-tests
+Section: misc
+Priority: optional
+Maintainer: William Woodall <william@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-crystal-ament-cmake, ros-crystal-ament-cmake-cppcheck, ros-crystal-ament-cmake-cpplint, ros-crystal-ament-cmake-gmock, ros-crystal-ament-cmake-gtest, ros-crystal-ament-cmake-lint-cmake, ros-crystal-ament-cmake-uncrustify, ros-crystal-ament-index-cpp, ros-crystal-resource-retriever, ros-crystal-rviz-rendering, ros-crystal-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-crystal-rviz-rendering-tests
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-crystal-resource-retriever, ros-crystal-rviz-rendering, ros-crystal-ros-workspace
+Description: Example plugin for RViz - documents and tests RViz plugin development
