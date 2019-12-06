@@ -1,0 +1,12 @@
+Source: ros-crystal-rviz-common
+Section: misc
+Priority: optional
+Maintainer: William Woodall <william@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-crystal-ament-cmake, ros-crystal-ament-cmake-cppcheck, ros-crystal-ament-cmake-cpplint, ros-crystal-ament-cmake-gmock, ros-crystal-ament-cmake-gtest, ros-crystal-ament-cmake-lint-cmake, ros-crystal-ament-cmake-uncrustify, ros-crystal-geometry-msgs, ros-crystal-pluginlib, ros-crystal-rclcpp, ros-crystal-resource-retriever, ros-crystal-rviz-assimp-vendor, ros-crystal-rviz-ogre-vendor, ros-crystal-rviz-rendering, ros-crystal-sensor-msgs, ros-crystal-std-msgs, ros-crystal-tf2, ros-crystal-tf2-geometry-msgs, ros-crystal-tf2-ros, ros-crystal-tinyxml-vendor, ros-crystal-urdf, ros-crystal-yaml-cpp-vendor, ros-crystal-ros-workspace
+Homepage: https://github.com/ros2/rviz/blob/ros2/README.md
+Standards-Version: 3.9.2
+
+Package: ros-crystal-rviz-common
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5opengl5, libqt5widgets5, qtbase5-dev, ros-crystal-geometry-msgs, ros-crystal-pluginlib, ros-crystal-rclcpp, ros-crystal-resource-retriever, ros-crystal-rviz-assimp-vendor, ros-crystal-rviz-ogre-vendor, ros-crystal-rviz-rendering, ros-crystal-sensor-msgs, ros-crystal-std-msgs, ros-crystal-tf2, ros-crystal-tf2-geometry-msgs, ros-crystal-tf2-ros, ros-crystal-tinyxml-vendor, ros-crystal-urdf, ros-crystal-yaml-cpp-vendor, ros-crystal-ros-workspace
+Description: Common rviz API, used by rviz plugins and applications.
