@@ -22,11 +22,20 @@ endif()
 
 macro(build_freetype)
   set(extra_cmake_args)
+  set(FREETYPE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
   if(WIN32)
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w")
+    list(APPEND FREETYPE_CXX_FLAGS "/w")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w")
   endif()
+
+  if(DEFINED CMAKE_TOOLCHAIN_FILE)
+    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  else()
+    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  endif()
+  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${FREETYPE_CXX_FLAGS}")
 
   include(ExternalProject)
   ExternalProject_Add(freetype-2.8.1
@@ -55,11 +64,20 @@ endmacro()
 
 macro(build_zlib)
   set(extra_cmake_args)
+  set(ZLIB_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
   if(WIN32)
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w")
+    list(APPEND ZLIB_CXX_FLAGS "/w")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w")
   endif()
+
+  if(DEFINED CMAKE_TOOLCHAIN_FILE)
+    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  else()
+    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  endif()
+  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${ZLIB_CXX_FLAGS}")
 
   include(ExternalProject)
   ExternalProject_Add(zlib-1.2.11
@@ -84,22 +102,31 @@ endmacro()
 
 macro(build_ogre)
   set(extra_cmake_args)
+  set(OGRE_CXX_FLAGS)
+  # standard library is important for linking, but the other cxx flags are not
+  if(CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
+    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -stdlib=libc++")
+  endif()
+
   if(DEFINED CMAKE_BUILD_TYPE)
     list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
   endif()
+
   if(WIN32)
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=/w /EHsc")
+    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} /w /EHsc")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=/w /EHsc")
   elseif(APPLE)
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=-std=c++14 -stdlib=libc++ -w")
+    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -std=c++14 -stdlib=libc++ -w")
     list(APPEND extra_cmake_args "-DCMAKE_OSX_ARCHITECTURES='x86_64'")
-  else()
-    list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=-std=c++14 -w")
+  else()  # Linux
+    # include Clang -Wno-everything to disable warnings in that build. GCC doesn't mind it
+    set(OGRE_CXX_FLAGS "${OGRE_CXX_FLAGS} -std=c++14 -w -Wno-everything")
     list(APPEND extra_cmake_args "-DCMAKE_C_FLAGS=-w")
   endif()
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_GL:BOOL=TRUE")
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_D3D11:BOOL=OFF")
   list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_D3D9:BOOL=OFF")
+  list(APPEND extra_cmake_args "-DCMAKE_CXX_FLAGS=${OGRE_CXX_FLAGS}")
 
   # Uncomment this line to enable the GL3PLUS render engine
   # list(APPEND extra_cmake_args "-DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=TRUE")
@@ -124,10 +151,17 @@ macro(build_ogre)
     set(patch_exe patch)
   endif()
 
+  if(DEFINED CMAKE_TOOLCHAIN_FILE)
+    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  else()
+    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  endif()
+
   include(ExternalProject)
   ExternalProject_Add(ogre-master-ca665a6
-    URL https://github.com/OGRECave/ogre/archive/v1.10.11.zip
-    URL_MD5 6ffd5048fae72805e287bfc0b462b2ea
+    URL https://github.com/OGRECave/ogre/archive/v1.10.12.zip
+    URL_MD5 c8d2626270d576a98cc40ea194fdb39e
     TIMEOUT 1200
     LOG_CONFIGURE ${should_log}
     LOG_BUILD ${should_log}
@@ -141,9 +175,11 @@ macro(build_ogre)
       -DOGRE_INSTALL_SAMPLES:BOOL=FALSE
       -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=FALSE
       -DOGRE_CONFIG_THREADS:STRING=0
-      -DOGRE_RESOURCEMANAGER_STRICT:BOOL=ON
+      -DOGRE_RESOURCEMANAGER_STRICT:STRING=2
       -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ogre_install
       -DOGRE_BUILD_LIBS_AS_FRAMEWORKS:BOOL=OFF
+      -DOGRE_BUILD_COMPONENT_PYTHON:BOOL=FALSE
+      -DOGRE_BUILD_COMPONENT_JAVA:BOOL=FALSE
       ${extra_cmake_args}
       -Wno-dev
     PATCH_COMMAND

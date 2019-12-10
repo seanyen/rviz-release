@@ -2,8 +2,36 @@
 Changelog for package rviz_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5.1.1 (2019-12-06)
+6.1.5 (2019-12-10)
 ------------------
+
+6.1.4 (2019-09-06)
+------------------
+
+6.1.3 (2019-07-31)
+------------------
+* Fixed deprecation warnings with new Qt (`#435 <https://github.com/ros2/rviz/issues/435>`_) (`#436 <https://github.com/ros2/rviz/issues/436>`_)
+* Contributors: William Woodall
+
+6.1.2 (2019-06-12)
+------------------
+* Changed the clock used to stamp publications, using one attached to a node instead so ``use_sim_time`` will work. (`#407 <https://github.com/ros2/rviz/issues/407>`_)
+* Contributors: Scott K Logan
+
+6.1.1 (2019-05-29)
+------------------
+
+6.1.0 (2019-05-20)
+------------------
+* Updated to use the new specification for types from the ROS node graph API. (`#387 <https://github.com/ros2/rviz/issues/387>`_)
+* Contributors: Jacob Perron
+
+6.0.0 (2019-05-08)
+------------------
+* Made changes to avoid newly deprecated API's related to publishers and subscriptions. (`#399 <https://github.com/ros2/rviz/issues/399>`_)
+* Updated to be compatible with new QoS settings.  (`#392 <https://github.com/ros2/rviz/issues/392>`_)
+* Fixed a crash on shutdown by properly freeing the ``transformation_manager``. (`#386 <https://github.com/ros2/rviz/issues/386>`_)
+* Contributors: M. M, Michael Jeronimo, William Woodall
 
 5.1.0 (2019-01-14)
 ------------------

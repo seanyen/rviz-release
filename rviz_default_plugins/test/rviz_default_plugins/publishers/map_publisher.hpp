@@ -51,7 +51,7 @@ public:
   MapPublisher()
   : Node("map_publisher")
   {
-    publisher = this->create_publisher<nav_msgs::msg::OccupancyGrid>("map");
+    publisher = this->create_publisher<nav_msgs::msg::OccupancyGrid>("map", 10);
     timer = this->create_wall_timer(500ms, std::bind(&MapPublisher::timer_callback, this));
   }
 
@@ -84,10 +84,10 @@ private:
       }
     }
 
-    auto occupancy_grid = std::make_shared<nav_msgs::msg::OccupancyGrid>();
-    occupancy_grid->header = header;
-    occupancy_grid->info = meta_data;
-    occupancy_grid->data = new_data;
+    nav_msgs::msg::OccupancyGrid occupancy_grid;
+    occupancy_grid.header = header;
+    occupancy_grid.info = meta_data;
+    occupancy_grid.data = new_data;
 
     publisher->publish(occupancy_grid);
   }

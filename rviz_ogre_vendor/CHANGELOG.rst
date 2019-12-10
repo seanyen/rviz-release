@@ -2,10 +2,49 @@
 Changelog for package rviz_ogre_vendor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5.1.1 (2019-12-06)
+6.1.5 (2019-12-10)
 ------------------
-* Constraint Freetype dependencies for more predictable build result on Windows. (`#393 <https://github.com/ros2/rviz/issues/393>`_)
-* Contributors: Sean Yen
+* Skip freetype2 dependencies (`#405 <https://github.com/ros2/rviz/issues/405>`_) (`#489 <https://github.com/ros2/rviz/issues/489>`_)
+* Contributors: Jacob Perron, Sean Yen
+
+6.1.4 (2019-09-06)
+------------------
+
+6.1.3 (2019-07-31)
+------------------
+* Mojave compatibility (`#414 <https://github.com/ros2/rviz/issues/414>`_) (`#433 <https://github.com/ros2/rviz/issues/433>`_)
+* Contributors: Karsten Knese
+
+6.1.2 (2019-06-12)
+------------------
+
+6.1.1 (2019-05-29)
+------------------
+
+6.1.0 (2019-05-20)
+------------------
+* Upgraded to OGRE 1.10.12 to get a macOS fix but also not break any APIs by upgrading to OGRE 1.11.x. (`#380 <https://github.com/ros2/rviz/issues/380>`_)
+* Contributors: Emerson Knapp
+
+6.0.0 (2019-05-08)
+------------------
+* Suppress ogre_vendor warnings in clang+libcxx build. The -w flag was not strong enough for Clang builds. (`#389 <https://github.com/ros2/rviz/issues/389>`_)
+  Signed-off-by: Emerson Knapp <eknapp@amazon.com>
+* Pass through only the stdlib flag to the vendor build, instead of all C++ flags (`#388 <https://github.com/ros2/rviz/issues/388>`_)
+  Signed-off-by: Emerson Knapp <eknapp@amazon.com>
+* Pass through CXX flags to OGRE vendor build (`#381 <https://github.com/ros2/rviz/issues/381>`_)
+  * Pass through CXX flags
+  Signed-off-by: Emerson Knapp <eknapp@amazon.com>
+  * fixup
+  Signed-off-by: William Woodall <william@osrfoundation.org>
+  * re-add removed libc++ flag, because OSX build always needs it
+  Signed-off-by: Emerson Knapp <eknapp@amazon.com>
+* Propagate toolchain-file to external-project (`#374 <https://github.com/ros2/rviz/issues/374>`_)
+  If defined, propagate the CMAKE_TOOLCHAIN_FILE argument to the cmake
+  argument of freetype, zlib and ogre projects.
+  Change-Id: Ibf2802b96c2238a06191e78a1b2a3128769a83af
+  Signed-off-by: Louis Mayencourt <louis.mayencourt@arm.com>
+* Contributors: Emerson Knapp, lmayencourt
 
 5.1.0 (2019-01-14)
 ------------------

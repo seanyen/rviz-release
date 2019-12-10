@@ -2,7 +2,34 @@
 Changelog for package rviz_rendering
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5.1.1 (2019-12-06)
+6.1.5 (2019-12-10)
+------------------
+
+6.1.4 (2019-09-06)
+------------------
+* Updated to use new ``eigen3_cmake_module``. (`#441 <https://github.com/ros2/rviz/issues/441>`_) (`#452 <https://github.com/ros2/rviz/issues/452>`_)
+* Contributors: Shane Loretz
+
+6.1.3 (2019-07-31)
+------------------
+
+6.1.2 (2019-06-12)
+------------------
+* Fixed a bug in the STL loader where an STL would be loaded twice and produce an error. (`#410 <https://github.com/ros2/rviz/issues/410>`_)
+  * Also fixed a warning about a missing material, by adding BaseWhiteNoLighting to the ``rviz_rendering`` resource group.
+  * Previous to Ogre 1.11, materials would be searched in all groups With 1.11, this is no longer true.
+  * In RViz, we try to put materials in our own resource group, but we need the Ogre fallback material.
+* Contributors: Martin Idel
+
+6.1.1 (2019-05-29)
+------------------
+* Fixed the installation destination of OGRE media resources which contain a ``dirname`` (`#404 <https://github.com/ros2/rviz/issues/404>`_)
+* Contributors: Dirk Thomas
+
+6.1.0 (2019-05-20)
+------------------
+
+6.0.0 (2019-05-08)
 ------------------
 
 5.1.0 (2019-01-14)

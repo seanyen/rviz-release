@@ -2,8 +2,36 @@
 Changelog for package rviz_default_plugins
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5.1.1 (2019-12-06)
+6.1.5 (2019-12-10)
 ------------------
+
+6.1.4 (2019-09-06)
+------------------
+
+6.1.3 (2019-07-31)
+------------------
+* Mojave compatibility (`#414 <https://github.com/ros2/rviz/issues/414>`_) (`#433 <https://github.com/ros2/rviz/issues/433>`_)
+* Fix map display (`#425 <https://github.com/ros2/rviz/issues/425>`_) (`#432 <https://github.com/ros2/rviz/issues/432>`_)
+* Contributors: Martin Idel, Jacob Perron, Karsten Knese
+
+6.1.2 (2019-06-12)
+------------------
+
+6.1.1 (2019-05-29)
+------------------
+
+6.1.0 (2019-05-20)
+------------------
+* Updated to use the new specification for types from the ROS node graph API. (`#387 <https://github.com/ros2/rviz/issues/387>`_)
+* Contributors: Jacob Perron
+
+6.0.0 (2019-05-08)
+------------------
+* Made changes to avoid newly deprecated API's related to publishers and subscriptions. (`#399 <https://github.com/ros2/rviz/issues/399>`_)
+* Made changes to avoid newly deprecated API's related to publish calls that used ``shared_ptr``. signature (`#398 <https://github.com/ros2/rviz/issues/398>`_)
+* Changed to use the ``ament_include_directories_order`` macro to ensure header include path ordering is correct. (`#384 <https://github.com/ros2/rviz/issues/384>`_)
+* Made changes to fix interoperability with ``robot_state_publisher``. `#14 <https://github.com/ros2/rviz/issues/14>`_ (`#378 <https://github.com/ros2/rviz/issues/378>`_)
+* Contributors: Karsten Knese, William Woodall, ivanpauno
 
 5.1.0 (2019-01-14)
 ------------------

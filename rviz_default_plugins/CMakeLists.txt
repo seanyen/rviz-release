@@ -55,7 +55,6 @@ find_package(ament_cmake REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(rviz_rendering REQUIRED)
 find_package(rviz_ogre_vendor REQUIRED)
-find_package(rviz_visual_testing_framework REQUIRED)
 
 find_package(Qt5 REQUIRED COMPONENTS Widgets Test)
 
@@ -295,6 +294,7 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_cmake_gmock REQUIRED)
   find_package(ament_index_cpp REQUIRED)
+  find_package(rviz_visual_testing_framework REQUIRED)
   find_package(sensor_msgs REQUIRED)
   find_package(visualization_msgs REQUIRED)
 
@@ -303,15 +303,16 @@ if(BUILD_TESTING)
     USE_SOURCE_PERMISSIONS)
 
   set(TEST_INCLUDE_DIRS
-    ${OGRE_INCLUDE_DIRS}
-    ${nav_msgs_INCLUDE_DIRS}
     ${map_msgs_INCLUDE_DIRS}
+    ${nav_msgs_INCLUDE_DIRS}
+    ${OGRE_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${rclcpp_INCLUDE_DIRS}
     ${sensor_msgs_INCLUDE_DIRS}
     ${urdf_INCLUDE_DIRS}
     ${visualization_msgs_INCLUDE_DIRS}
   )
+  ament_include_directories_order(TEST_INCLUDE_DIRS ${TEST_INCLUDE_DIRS})
 
   set(TEST_LINK_LIBRARIES
     rviz_default_plugins
