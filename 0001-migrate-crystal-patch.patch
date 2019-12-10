@@ -1,4 +1,4 @@
-From af332769dec5709d5381a1e4cc9c516ec21b69b2 Mon Sep 17 00:00:00 2001
+From 7ba9a186108b7e83158c752c490358d4d4476afa Mon Sep 17 00:00:00 2001
 From: William Woodall <william@osrfoundation.org>
 Date: Thu, 9 May 2019 00:24:57 -0700
 Subject: [PATCH] migrate crystal patch
@@ -8,7 +8,7 @@ Subject: [PATCH] migrate crystal patch
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/debian/rules.em b/debian/rules.em
-index 9c9604d..ebc5f61 100755
+index 9c9604d9..ebc5f61d 100755
 --- a/debian/rules.em
 +++ b/debian/rules.em
 @@ -50,7 +50,7 @@ override_dh_shlibdeps:
@@ -21,5 +21,5 @@ index 9c9604d..ebc5f61 100755
  override_dh_auto_install:
  	# In case we're installing to a non-standard location, look for a setup.sh
 -- 
-2.20.1 (Apple Git-117)
+2.17.1
 
