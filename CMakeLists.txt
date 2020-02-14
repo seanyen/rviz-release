@@ -198,6 +198,14 @@ macro(build_ogre)
   )
 endmacro()
 
+find_package(OGRE 1.12 QUIET)
+if(OGRE_FOUND)
+  ament_package(
+    CONFIG_EXTRAS "rviz_ogre_vendor-extras.cmake.in"
+  )
+  return()
+endif()
+
 if(BUILDING_FREETYPE_LOCALLY)
   build_freetype()
 endif()
