@@ -1,3 +1,37 @@
+## rviz (rolling) - 8.2.0-1
+
+The packages in the `rviz` repository were released into the `rolling` distro by running `/Users/william/.pyenv/versions/3.8.0/bin/bloom-release -r rolling -t rolling rviz` on `Wed, 24 Jun 2020 02:49:19 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+These packages were explicitly ignored:
+- `rviz`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: https://github.com/ros2-gbp/rviz-release.git
+- rosdistro version: `8.1.1-2`
+- old version: `8.1.1-2`
+- new version: `8.2.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.7`
+- catkin_pkg version: `0.4.20`
+- rosdep version: `0.19.0`
+- rosdistro version: `0.8.2`
+- vcstools version: `0.1.42`
+
+
 ## rviz (foxy) - 8.2.0-1
 
 The packages in the `rviz` repository were released into the `foxy` distro by running `/Users/william/.pyenv/versions/3.8.0/bin/bloom-release -r foxy -t foxy rviz` on `Wed, 24 Jun 2020 02:27:11 -0000`
