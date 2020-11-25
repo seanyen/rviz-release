@@ -1,3 +1,37 @@
+## rviz (dashing) - 6.1.7-2
+
+The packages in the `rviz` repository were released into the `dashing` distro by running `/home/steven/.local/bin/bloom-release -r dashing rviz` on `Wed, 25 Nov 2020 02:59:23 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+These packages were explicitly ignored:
+- `rviz`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: https://github.com/ros2-gbp/rviz-release.git
+- rosdistro version: `6.1.6-1`
+- old version: `6.1.7-1`
+- new version: `6.1.7-2`
+
+Versions of tools used:
+
+- bloom version: `0.10.0`
+- catkin_pkg version: `0.4.16`
+- rosdep version: `0.18.0`
+- rosdistro version: `0.8.0`
+- vcstools version: `0.1.42`
+
+
 ## rviz (dashing) - 6.1.7-1
 
 The packages in the `rviz` repository were released into the `dashing` distro by running `/home/steven/.local/bin/bloom-release -r dashing rviz` on `Wed, 25 Nov 2020 01:59:14 -0000`
