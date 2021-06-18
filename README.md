@@ -1,3 +1,37 @@
+## rviz (foxy) - 8.2.2-1
+
+The packages in the `rviz` repository were released into the `foxy` distro by running `/home/michael/.local/bin/bloom-release -r foxy -t foxy rviz` on `Fri, 18 Jun 2021 22:26:35 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+These packages were explicitly ignored:
+- `rviz`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: https://github.com/ros2-gbp/rviz-release.git
+- rosdistro version: `8.2.1-1`
+- old version: `8.2.1-1`
+- new version: `8.2.2-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.23`
+- rosdep version: `0.20.1`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## rviz (rolling) - 8.6.0-2
 
 The packages in the `rviz` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --track rolling --rosdistro rolling rviz` on `Wed, 26 May 2021 16:25:13 -0000`
