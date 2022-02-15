@@ -1,3 +1,34 @@
+## rviz (rolling) - 9.1.1-3
+
+The packages in the `rviz` repository were released into the `rolling` distro by running `/home/steven/osrf/bloom/.direnv/python-3.10.2/bin/bloom-release -r rolling rviz --override-release-repository-push-url git@github.com:ros2-gbp/rviz-release` on `Tue, 15 Feb 2022 21:42:26 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: https://github.com/ros2-gbp/rviz-release.git
+- rosdistro version: `9.1.1-2`
+- old version: `9.1.1-2`
+- new version: `9.1.1-3`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## rviz (foxy) - 8.2.6-1
 
 The packages in the `rviz` repository were released into the `foxy` distro by running `/usr/bin/bloom-release -r foxy rviz` on `Fri, 04 Feb 2022 16:35:53 -0000`
