@@ -1,3 +1,34 @@
+## rviz (galactic) - 8.5.1-1
+
+The packages in the `rviz` repository were released into the `galactic` distro by running `/usr/bin/bloom-release --track galactic --rosdistro galactic rviz` on `Thu, 28 Apr 2022 14:49:39 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: https://github.com/ros2-gbp/rviz-release.git
+- rosdistro version: `8.5.0-3`
+- old version: `8.5.0-3`
+- new version: `8.5.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.1`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## rviz (humble) - 11.2.1-1
 
 The packages in the `rviz` repository were released into the `humble` distro by running `/usr/bin/bloom-release --track humble --rosdistro humble rviz` on `Tue, 26 Apr 2022 20:38:16 -0000`
