@@ -1,3 +1,34 @@
+## rviz (rolling) - 14.3.1-1
+
+The packages in the `rviz` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling rviz` on `Fri, 11 Oct 2024 13:27:01 -0000`
+
+These packages were released:
+- `rviz2`
+- `rviz_assimp_vendor`
+- `rviz_common`
+- `rviz_default_plugins`
+- `rviz_ogre_vendor`
+- `rviz_rendering`
+- `rviz_rendering_tests`
+- `rviz_visual_testing_framework`
+
+Version of package(s) in repository `rviz`:
+
+- upstream repository: https://github.com/ros2/rviz.git
+- release repository: https://github.com/ros2-gbp/rviz-release.git
+- rosdistro version: `14.3.0-1`
+- old version: `14.3.0-1`
+- new version: `14.3.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.25.1`
+- rosdistro version: `0.9.1`
+- vcstools version: `0.1.42`
+
+
 ## rviz (rolling) - 14.3.0-1
 
 The packages in the `rviz` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --track rolling --rosdistro rolling rviz` on `Thu, 03 Oct 2024 14:54:47 -0000`
